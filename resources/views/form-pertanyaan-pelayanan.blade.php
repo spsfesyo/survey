@@ -115,48 +115,54 @@
                                                 @break
 
                                                 @case(2)
-                                                    {{-- Checkbox --}}
                                                     @php
                                                         $jawabanCheckbox = $jawabanUtama ?? [];
                                                         if (!is_array($jawabanCheckbox)) {
                                                             $jawabanCheckbox = [$jawabanCheckbox];
                                                         }
+                                                        $batas = $pertanyaan->batas_pilihan;
                                                     @endphp
-                                                    @foreach ($pertanyaan->options as $option)
-                                                        @php
-                                                            $isOther = $option->is_other;
-                                                            $isChecked =
-                                                                in_array(strval($option->id), $jawabanCheckbox) ||
-                                                                in_array('other_' . $option->id, $jawabanCheckbox);
-                                                        @endphp
-                                                        @if ($isOther)
-                                                            <label>
-                                                                <input type="checkbox"
-                                                                    class="checkbox-group-{{ $pertanyaan->id }}"
-                                                                    name="pertanyaan_{{ $pertanyaan->id }}[]"
-                                                                    value="other_{{ $option->id }}"
-                                                                    onchange="toggleOtherInput(this, '{{ $pertanyaan->id }}_{{ $option->id }}')"
-                                                                    {{ $isChecked ? 'checked' : '' }}>
-                                                                Lainnya:
-                                                                <input type="text"
-                                                                    name="pertanyaan_{{ $pertanyaan->id }}_other_{{ $option->id }}"
-                                                                    id="other_input_{{ $pertanyaan->id }}_{{ $option->id }}"
-                                                                    class="form-control mt-1"
-                                                                    style="{{ $isChecked ? '' : 'display: none;' }}"
-                                                                    placeholder="Tuliskan jawaban Anda"
-                                                                    value="{{ $sessionData['pertanyaan_' . $pertanyaan->id . '_other_' . $option->id] ?? '' }}">
-                                                            </label>
-                                                        @else
-                                                            <label>
-                                                                <input type="checkbox"
-                                                                    class="checkbox-group-{{ $pertanyaan->id }}"
-                                                                    name="pertanyaan_{{ $pertanyaan->id }}[]"
-                                                                    value="{{ $option->id }}"
-                                                                    {{ $isChecked ? 'checked' : '' }}>
-                                                                {{ $option->options ?? 'Opsi' }}
-                                                            </label><br>
-                                                        @endif
-                                                    @endforeach
+
+                                                    <div class="checkbox-wrapper" data-question-id="{{ $pertanyaan->id }}"
+                                                        data-batas-pilihan="{{ $batas }}">
+                                                        @foreach ($pertanyaan->options as $option)
+                                                            @php
+                                                                $isOther = $option->is_other;
+                                                                $isChecked =
+                                                                    in_array(strval($option->id), $jawabanCheckbox) ||
+                                                                    in_array('other_' . $option->id, $jawabanCheckbox);
+                                                            @endphp
+
+                                                            @if ($isOther)
+                                                                <label>
+                                                                    <input type="checkbox"
+                                                                        class="checkbox-group-{{ $pertanyaan->id }}"
+                                                                        name="pertanyaan_{{ $pertanyaan->id }}[]"
+                                                                        value="other_{{ $option->id }}"
+                                                                        onchange="toggleOtherInput(this, '{{ $pertanyaan->id }}_{{ $option->id }}')"
+                                                                        {{ $isChecked ? 'checked' : '' }}>
+                                                                    Lainnya:
+                                                                    <input type="text"
+                                                                        name="pertanyaan_{{ $pertanyaan->id }}_other_{{ $option->id }}"
+                                                                        id="other_input_{{ $pertanyaan->id }}_{{ $option->id }}"
+                                                                        class="form-control mt-1"
+                                                                        style="{{ $isChecked ? '' : 'display: none;' }}"
+                                                                        placeholder="Tuliskan jawaban Anda"
+                                                                        value="{{ session('form_pelayanan')['pertanyaan_' . $pertanyaan->id . '_other_' . $option->id] ?? '' }}">
+                                                                </label>
+                                                            @else
+                                                                <label>
+                                                                    <input type="checkbox"
+                                                                        class="checkbox-group-{{ $pertanyaan->id }}"
+                                                                        name="pertanyaan_{{ $pertanyaan->id }}[]"
+                                                                        value="{{ $option->id }}"
+                                                                        {{ $isChecked ? 'checked' : '' }}>
+                                                                    {{ $option->options }}
+                                                                </label><br>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+
                                                     <input type="hidden" name="required_checkbox[]"
                                                         value="{{ $pertanyaan->id }}">
                                                 @break
@@ -213,63 +219,81 @@
     <script src="{{ asset('library/moment/min/moment.min.js') }}"></script>
     <script src="{{ asset('js/stisla.js') }}"></script>
 
-    <!-- JS Libraies -->
-    <script>
-        document.querySelector('form').addEventListener('submit', function(e) {
-            let isValid = true;
+    <!-- Validasi & Logika Form -->
+    {{-- <!-- General JS Scripts -->
+    <script src="{{ asset('library/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ asset('library/popper.js/dist/umd/popper.js') }}"></script>
+    <script src="{{ asset('library/tooltip.js/dist/umd/tooltip.js') }}"></script>
+    <script src="{{ asset('library/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('library/jquery.nicescroll/dist/jquery.nicescroll.min.js') }}"></script>
+    <script src="{{ asset('library/moment/min/moment.min.js') }}"></script>
+    <script src="{{ asset('js/stisla.js') }}"></script> --}}
 
-            document.querySelectorAll('input[name="required_checkbox[]"]').forEach(function(hiddenInput) {
-                let id = hiddenInput.value;
-                let checkboxes = document.querySelectorAll('.checkbox-group-' + id);
-                let checked = Array.from(checkboxes).some(cb => cb.checked);
-
-                if (!checked) {
-                    isValid = false;
-                    alert('Mohon pilih minimal satu opsi untuk pertanyaan wajib.');
-                }
-            });
-
-            if (!isValid) {
-                e.preventDefault();
-            }
-        });
-    </script>   
-    <!-- Page Specific JS File -->
-
-    <!-- Template JS File -->
-    <script src="{{ asset('js/scripts.js') }}"></script>
-    <script src="{{ asset('js/custom.js') }}"></script>
-
-
+    <!-- Validasi & Logika Form -->
     <script>
         function toggleOtherInput(input, id) {
-            const textInput = document.getElementById('other_input_' + id);
-            if (!textInput) return;
+            const el = document.getElementById('other_input_' + id);
+            if (!el) return;
 
-            if (input.type === 'radio') {
-                // Sembunyikan semua input lainnya dengan nama serupa
-                document.querySelectorAll(`input[id^="other_input_${id}"]`).forEach(el => el.style.display = 'none');
-            }
-
-            textInput.style.display = input.checked ? 'inline-block' : 'none';
-
-            // Kosongkan input jika tidak dicentang
-            if (!input.checked) {
-                textInput.value = '';
+            if (input.checked) {
+                el.style.display = 'inline-block';
+            } else {
+                el.style.display = 'none';
+                el.value = '';
             }
         }
-    </script>
 
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.checkbox-wrapper').forEach(function(wrapper) {
+                const batas = parseInt(wrapper.dataset.batasPilihan);
+                const id = wrapper.dataset.questionId;
+                const checkboxes = wrapper.querySelectorAll('.checkbox-group-' + id);
 
-    <script>
-        @if (session('success'))
-            Swal.fire({
-                title: 'Sukses!',
-                text: '{{ session('success') }}',
-                icon: 'success',
-                confirmButtonText: 'OK'
+                function enforceLimit() {
+                    const checked = Array.from(checkboxes).filter(cb => cb.checked);
+                    checkboxes.forEach(cb => cb.disabled = checked.length >= batas && !cb.checked);
+                }
+
+                checkboxes.forEach(cb => cb.addEventListener('change', enforceLimit));
+                enforceLimit();
             });
-        @endif
+
+            document.querySelector('form')?.addEventListener('submit', function(e) {
+                let isValid = true;
+                let messages = [];
+
+                document.querySelectorAll('input[name="required_checkbox[]"]').forEach(function(input) {
+                    const id = input.value;
+                    const wrapper = document.querySelector('.checkbox-wrapper[data-question-id="' +
+                        id + '"]');
+                    const batas = parseInt(wrapper?.dataset.batasPilihan || 0);
+                    const checkboxes = wrapper?.querySelectorAll('.checkbox-group-' + id);
+                    const checkedCount = Array.from(checkboxes ?? []).filter(cb => cb.checked)
+                        .length;
+
+                    if (batas && checkedCount < batas) {
+                        isValid = false;
+                        messages.push(
+                            `Pertanyaan ${id} minimal memilih ${batas} jawaban. Anda memilih ${checkedCount}.`
+                            );
+                    }
+
+                    if (!batas && checkedCount === 0) {
+                        isValid = false;
+                        messages.push(`Pertanyaan ${id} wajib memilih minimal 1 opsi.`);
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Validasi Gagal',
+                        html: messages.join('<br>')
+                    });
+                }
+            });
+        });
     </script>
 
 </html>
