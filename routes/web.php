@@ -6,6 +6,7 @@ use App\Http\Controllers\testController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\RespondentController;
 use App\Http\Controllers\AdminStatistikController;
+use App\Http\Controllers\DoorprizeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,10 +69,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/admin-dashboard', [AdminAuthController::class, 'showDashboard'])->name('admin-dashboard');
     Route::get('/admin-statistik', [AdminStatistikController::class, 'showStatistik'])->name('admin-statistik');
+    // Route::get('/admin-statistik', [AdminStatistikController::class, 'showTableKuisioner'])->name('admin-statistik-table');
     // Route::get('/admin-statistik', [AdminStatistikController::class, 'showPieChart'])->name('admin-pie-chart');
-    Route::get('/download-charts/{type}', [AdminStatistikController::class, 'downloadChartsZip']) ->name('download.charts.zip');
+    Route::get('/download-charts/{type}', [AdminStatistikController::class, 'downloadChartsZip'])->name('download.charts.zip');
     Route::get('/admin/statistik/pie-data', [AdminStatistikController::class, 'downloadPieCharts'])->name('download-pie-charts');
-    Route::get('/export-respondent', [AdminStatistikController::class, 'ExportExcel'])->name('export.respondent');
+    Route::get('/export-respondent/{jenisId}', [AdminStatistikController::class, 'ExportExcel'])->name('export.respondent');
+    Route::get('/admin-doorprize', [DoorprizeController::class, 'index'])->name('admin-doorprize');
 });
 
 // Route::middleware('auth:survey')->get('/dashboard', function () {

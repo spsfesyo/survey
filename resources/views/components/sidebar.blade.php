@@ -31,6 +31,10 @@
                     href="{{ route('admin-statistik') }}"><i class="fas fa-calculator"></i> <span>Statistik</span></a>
             </li>
 
+             <li class="{{ Request::is('admin-doorprize') ? 'active' : '' }}">
+                <a class="nav-link"
+                    href="{{ route('admin-doorprize') }}"><i class="fas fa-gift"></i> <span>Doorprize</span></a>
+            </li>
             {{-- <li class="{{ Request::is('admin-statistik') ? 'active' : '' }}">
                 <a class="nav-link"
                     href="{{ route('admin-statistik') }}"><i class="fas fa-calculator"></i> <span>Statistik</span></a>

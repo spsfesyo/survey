@@ -40,6 +40,31 @@ class AdminStatistikController extends Controller
             'answers.options'
         ])->paginate(5, ['*'], 'tabel');
 
+
+        // fungsi untuk memisahkan blesscon dan superior
+
+        // Ambil respondent dengan jenis_pertanyaan_id = 1 (misal Blesscon)
+        $respondentsJenis1 = MasterRespondent::with([
+            'provinsi',
+            'kota',
+            'JenisPertanyaan',
+            'answers.options'
+        ])
+            ->where('jenis_pertanyaan_id', 1)
+            ->orderBy('created_at', 'desc') // ⬅️ tambahkan ini
+            ->paginate(5, ['*'], 'tabel1');
+
+        // Ambil respondent dengan jenis_pertanyaan_id = 2 (misal Superior)
+        $respondentsJenis2 = MasterRespondent::with([
+            'provinsi',
+            'kota',
+            'JenisPertanyaan',
+            'answers.options'
+        ])
+            ->where('jenis_pertanyaan_id', 2)
+            ->orderBy('created_at', 'desc') // ⬅️ tambahkan ini
+            ->paginate(5, ['*'], 'tabel2');
+
         // Ambil semua data untuk chart (tidak perlu pagination di sini)
         $respondentsAll = MasterRespondent::with([
             'provinsi',
@@ -325,62 +350,53 @@ class AdminStatistikController extends Controller
             'chartPaginated' => $paginatedChart,
             'barChartPaginated' => $paginatedBarChart,
             'chartDataAll' => $chartData,         // ALL pie chart data
-            'barChartDataAll' => $barChartData    // ALL bar chart data
+            'barChartDataAll' => $barChartData,   // ALL bar chart data
+            'respondentsJenis1' => $respondentsJenis1,
+            'respondentsJenis2' => $respondentsJenis2
         ]);
     }
 
 
 
-    // public function showPieChart()
+    // public function showTableKuisioner()
     // {
-    //     // Ambil semua data respondents dan pertanyaan
-    //     $respondents = MasterRespondent::with(['provinsi', 'kota', 'JenisPertanyaan', 'answers.options'])->get();
-    //     $pertanyaanList = MasterPertanyaan::all();
 
-    //     // Filter pertanyaan yang punya reference (khusus tipe_pertanyaan_id = 5)
-    //     $pertanyaanReferenceOnly = $pertanyaanList->filter(function ($p) {
-    //         return $p->master_tipe_pertanyaan_id == 5 && $p->reference;
-    //     });
+    //     $pertanyaanListKuisioner = MasterPertanyaan::orderBy('order')->get();
 
-    //     $chartData = [];
+    //     // Ambil respondent dengan jenis_pertanyaan_id = 1 (misal Blesscon)
+    //     $respondentsJenis1 = MasterRespondent::with([
+    //         'provinsi',
+    //         'kota',
+    //         'JenisPertanyaan',
+    //         'answers.options'
+    //     ])
+    //         ->where('jenis_pertanyaan_id', 1)
+    //         ->paginate(5, ['*'], 'tabel1');
 
-    //     foreach ($pertanyaanReferenceOnly as $pertanyaan) {
-    //         $reference = $pertanyaan->reference;
+    //     // Ambil respondent dengan jenis_pertanyaan_id = 2 (misal Superior)
+    //     $respondentsJenis2 = MasterRespondent::with([
+    //         'provinsi',
+    //         'kota',
+    //         'JenisPertanyaan',
+    //         'answers.options'
+    //     ])
+    //         ->where('jenis_pertanyaan_id', 2)
+    //         ->paginate(5, ['*'], 'tabel2');
 
-    //         // Ambil semua jawaban dari field reference
-    //         $answers = $respondents->map(function ($responden) use ($reference) {
-    //             switch ($reference) {
-    //                 case 'provinsi_id':
-    //                     return $responden->provinsi->nama_provinsi ?? 'Tidak diketahui';
-    //                 case 'kota_id':
-    //                     return $responden->kota->kota ?? 'Tidak diketahui';
-    //                 case 'jenis_pertanyaan_id':
-    //                     return $responden->JenisPertanyaan->jenis_pertanyaan ?? 'Tidak diketahui';
-    //                 default:
-    //                     return $responden->{$reference} ?? 'Tidak diketahui';
-    //             }
-    //         });
-
-    //         // Hitung jumlah per kategori
-    //         $grouped = $answers->countBy();
-
-    //         $chartData[] = [
-    //             'chartId' => 'chart_' . $pertanyaan->id,
-    //             'label' => $pertanyaan->pertanyaan,
-    //             'labels' => $grouped->keys()->toArray(),
-    //             'values' => $grouped->values()->toArray(),
-    //         ];
-    //     }
-    //     return view('admin-pie-chart', compact('chartData'));
+    //     return view('Admin.admin-statistik', compact(
+    //         'pertanyaanListKuisioner',
+    //         'respondentsJenis1',
+    //         'respondentsJenis2'
+    //     ));
     // }
-
 
     /**
      * Show the form for creating a new resource.
      */
-    public function ExportExcel()
+    public function exportExcel($jenisId)
     {
-        return Excel::download(new RespondentExport, 'data-respondent.xlsx');
+        $namaFile = $jenisId == 1 ? 'data-respondent-blesscon.xlsx' : 'data-respondent-superior.xlsx';
+        return Excel::download(new RespondentExport($jenisId), $namaFile);
     }
 
     /**

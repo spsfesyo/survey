@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ asset('library/jqvmap/dist/jqvmap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
 
+
     <style>
         .thead-sticky th {
             background: #fff;
@@ -37,13 +38,15 @@
                 <h1>Statistik</h1>
             </div>
 
+            {{-- untuk pilihan Superior --}}
+
             <div class="section-body">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-12 col-sm-12">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">Tabel Hasil Data Respondent</h4>
-                                <a href="{{ route('export.respondent') }}" class="btn btn-icon icon-left btn-success">
+                                <h4 class="mb-0">Tabel Hasil Data Respondent Merek Blesscon</h4>
+                                <a href="{{ route('export.respondent', 1) }}" class="btn btn-icon icon-left btn-success">
                                     <i class="fas fa-download"></i> Excel
                                 </a>
                             </div>
@@ -55,39 +58,20 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Tanggal</th>
-                                                <!-- <th>Nama Respondent</th>
-                                                                                                                                                                                                                                                                             <th>Provinsi Lokasi Toko</th>
-                                                                                                                                                                                                                                                                             <th>Kota / Kabupaten Lokasi Toko</th>
-                                                                                                                                                                                                                                                                             <th>Email Responden</th>
-                                                                                                                                                                                                                                                                             <th>Alamat Toko</th>
-                                                                                                                                                                                                                                                                             <th>Nama Toko</th>
-                                                                                                                                                                                                                                                                             <th>Nomor Telepon</th>
-                                                                                                                                                                                                                                                                             <th>Selama ini Anda membeli merek apa dari Produk Bata Ringan kami?</th> -->
-
                                                 @foreach ($pertanyaanList as $pertanyaan)
                                                     <th>{{ $pertanyaan->pertanyaan }}</th>
                                                 @endforeach
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($respondents as $respondent)
+                                            @foreach ($respondentsJenis1 as $respondent)
                                                 <tr>
-                                                    <td> {{ $loop->iteration + ($respondents->currentPage() - 1) * $respondents->perPage() }}
-                                                    </td> {{-- Nomor urut --}}
+                                                    <td>{{ $loop->iteration + ($respondentsJenis1->currentPage() - 1) * $respondentsJenis1->perPage() }}
+                                                    </td>
                                                     <td>{{ \Carbon\Carbon::parse($respondent->created_at)->format('d-m-Y') }}
                                                     </td>
-                                                    <!-- <td>{{ $respondent->nama_respondent }}</td>
-                                                                                                                                                                                                                                                                                 <td>{{ $respondent->provinsi->nama_provinsi ?? '-' }}</td>
-                                                                                                                                                                                                                                                                                 <td>{{ $respondent->kota->kota ?? '-' }}</td>
-                                                                                                                                                                                                                                                                                 <td>{{ $respondent->email_respondent }}</td>
-                                                                                                                                                                                                                                                                                 <td>{{ $respondent->alamat_toko_respondent }}</td>
-                                                                                                                                                                                                                                                                                 <td>{{ $respondent->nama_toko_respondent }}</td>
-                                                                                                                                                                                                                                                                                 <td>{{ $respondent->telepone_respondent }}</td>
-                                                                                                                                                                                                                                                                                 <td>{{ $respondent->JenisPertanyaan->jenis_pertanyaan ?? '-' }}</td> -->
-
                                                     @foreach ($pertanyaanList as $pertanyaan)
                                                         @php
-                                                            // Cek apakah tipe pertanyaan adalah 5 (mengambil dari kolom lain di respondent)
                                                             if (
                                                                 $pertanyaan->master_tipe_pertanyaan_id == 5 &&
                                                                 $pertanyaan->reference
@@ -109,24 +93,18 @@
                                                                         $jawaban =
                                                                             $respondent->{$pertanyaan->reference} ??
                                                                             '-';
-                                                                        break;
                                                                 }
                                                             } else {
-                                                                // Ambil jawaban dari relasi answers
                                                                 $jawaban = $respondent->answers
                                                                     ->where('master_pertanyaan_id', $pertanyaan->id)
                                                                     ->map(function ($a) {
                                                                         $option = $a->options->options ?? null;
-
-                                                                        // Jika jawaban adalah "Other" / "Lainnya", gunakan input teks-nya
                                                                         if (
                                                                             strtolower($option) === 'other' ||
                                                                             strtolower($option) === 'lainnya'
                                                                         ) {
                                                                             return $a->lainnya ?? 'Other';
                                                                         }
-
-                                                                        // Jika tidak ada relasi option, gunakan jawaban_teks atau lainnya
                                                                         return $option ??
                                                                             ($a->jawaban_teks ?? $a->lainnya);
                                                                     })
@@ -143,7 +121,99 @@
                             </div>
                             <div class="card-footer text-right">
                                 <div class="d-inline-block">
-                                    {{ $respondents->appends(request()->except('tabel'))->links('pagination::bootstrap-4') }}
+                                    {{ $respondentsJenis1->appends(request()->except('tabel1'))->links('pagination::bootstrap-4') }}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                {{-- untuk Pilihan yang Blesscon --}}
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-12 col-sm-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4 class="mb-0">Tabel Hasil Data Respondent Merek Superior</h4>
+                                <a href="{{ route('export.respondent', 2) }}
+                                " class="btn btn-icon icon-left btn-success">
+                                    <i class="fas fa-download"></i> Excel
+                                </a>
+                            </div>
+
+                            <div class="card-body text-center">
+                                <div class="table-responsive" style="max-height: 500px; overflow: auto;">
+                                    <table class="table table-bordered table-md" style="min-width: 1200px;">
+                                        <thead class="thead-sticky bg-light">
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Tanggal</th>
+                                                @foreach ($pertanyaanList as $pertanyaan)
+                                                    <th>{{ $pertanyaan->pertanyaan }}</th>
+                                                @endforeach
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($respondentsJenis2 as $respondent)
+                                                <tr>
+                                                    <td>{{ $loop->iteration + ($respondentsJenis2->currentPage() - 1) * $respondentsJenis2->perPage() }}
+                                                    </td>
+                                                    <td>{{ \Carbon\Carbon::parse($respondent->created_at)->format('d-m-Y') }}
+                                                    </td>
+                                                    @foreach ($pertanyaanList as $pertanyaan)
+                                                        @php
+                                                            if (
+                                                                $pertanyaan->master_tipe_pertanyaan_id == 5 &&
+                                                                $pertanyaan->reference
+                                                            ) {
+                                                                switch ($pertanyaan->reference) {
+                                                                    case 'provinsi_id':
+                                                                        $jawaban =
+                                                                            $respondent->provinsi->nama_provinsi ?? '-';
+                                                                        break;
+                                                                    case 'kota_id':
+                                                                        $jawaban = $respondent->kota->kota ?? '-';
+                                                                        break;
+                                                                    case 'jenis_pertanyaan_id':
+                                                                        $jawaban =
+                                                                            $respondent->JenisPertanyaan
+                                                                                ->jenis_pertanyaan ?? '-';
+                                                                        break;
+                                                                    default:
+                                                                        $jawaban =
+                                                                            $respondent->{$pertanyaan->reference} ??
+                                                                            '-';
+                                                                }
+                                                            } else {
+                                                                $jawaban = $respondent->answers
+                                                                    ->where('master_pertanyaan_id', $pertanyaan->id)
+                                                                    ->map(function ($a) {
+                                                                        $option = $a->options->options ?? null;
+                                                                        if (
+                                                                            strtolower($option) === 'other' ||
+                                                                            strtolower($option) === 'lainnya'
+                                                                        ) {
+                                                                            return $a->lainnya ?? 'Other';
+                                                                        }
+                                                                        return $option ??
+                                                                            ($a->jawaban_teks ?? $a->lainnya);
+                                                                    })
+                                                                    ->implode(', ');
+                                                            }
+                                                        @endphp
+                                                        <td>{{ $jawaban }}</td>
+                                                    @endforeach
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer text-right">
+                                <div class="d-inline-block">
+                                    {{ $respondentsJenis2->appends(request()->except('tabel2'))->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>
                         </div>
@@ -196,7 +266,7 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">Diagram Batang Data Respondent</h4>
+                                <h4 class="mb-0">Diagram Batang Data Respondent </h4>
                                 <button type="button" class="btn btn-success" onclick="downloadAllCharts('bar')">
                                     <i class="fas fa-download"></i> Download Semua Diagram Batang (.zip)
                                 </button>
@@ -267,44 +337,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
 
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script> --}}
 
-    {{-- <script>
-        function downloadAllCharts(type) {
-            const zip = new JSZip();
-            const canvases = document.querySelectorAll(`#chartDownloadArea canvas[id^="hidden_${type}_"]`);
-
-            if (canvases.length === 0) {
-                alert('Tidak ada chart untuk di-download!');
-                return;
-            }
-
-            let processed = 0;
-
-            canvases.forEach((canvas, index) => {
-                // Tunggu render (jika perlu delay kecil)
-                setTimeout(() => {
-                    canvas.toBlob(blob => {
-                        if (blob) {
-                            zip.file(`chart_${type}_${index + 1}.jpg`, blob);
-                        } else {
-                            console.warn(`Chart ${index + 1} gagal dikonversi`);
-                        }
-
-                        processed++;
-                        if (processed === canvases.length) {
-                            zip.generateAsync({
-                                type: "blob"
-                            }).then(content => {
-                                saveAs(content, `${type}_charts.zip`);
-                            });
-                        }
-                    }, 'image/jpeg', 0.95);
-                }, 300); // memberi waktu render jika perlu
-            });
-        }
-    </script> --}}
 
     <script>
         function downloadAllCharts(type) {
@@ -393,11 +426,63 @@
     </script>
 
 
+    <!-- Template JS File -->
+    <script src="{{ asset('js/scripts.js') }}"></script> {{-- penting! --}}
+    <script src="{{ asset('js/custom.js') }}"></script>
+@endpush
 
 
-    <!-- Custom Diagram Page Script -->
-    {{-- <script src="{{ asset('js/diagram-page.js') }}"></script> --}}
-    {{-- <script>
+
+
+
+
+
+{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script> --}}
+
+{{-- <script>
+        function downloadAllCharts(type) {
+            const zip = new JSZip();
+            const canvases = document.querySelectorAll(`#chartDownloadArea canvas[id^="hidden_${type}_"]`);
+
+            if (canvases.length === 0) {
+                alert('Tidak ada chart untuk di-download!');
+                return;
+            }
+
+            let processed = 0;
+
+            canvases.forEach((canvas, index) => {
+                // Tunggu render (jika perlu delay kecil)
+                setTimeout(() => {
+                    canvas.toBlob(blob => {
+                        if (blob) {
+                            zip.file(`chart_${type}_${index + 1}.jpg`, blob);
+                        } else {
+                            console.warn(`Chart ${index + 1} gagal dikonversi`);
+                        }
+
+                        processed++;
+                        if (processed === canvases.length) {
+                            zip.generateAsync({
+                                type: "blob"
+                            }).then(content => {
+                                saveAs(content, `${type}_charts.zip`);
+                            });
+                        }
+                    }, 'image/jpeg', 0.95);
+                }, 300); // memberi waktu render jika perlu
+            });
+        }
+    </script> --}}
+
+
+
+
+
+<!-- Custom Diagram Page Script -->
+{{-- <script src="{{ asset('js/diagram-page.js') }}"></script> --}}
+{{-- <script>
         async function downloadAllChartsAsZip() {
             const zip = new JSZip();
             const canvases = document.querySelectorAll('canvas[id^="pieChart-"], canvas[id^="pieChart"]');
@@ -420,7 +505,7 @@
         }
     </script> --}}
 
-    {{-- <script>
+{{-- <script>
         // Contoh ambil semua canvas chart dan kirim ke backend
         let charts = [];
         document.querySelectorAll('canvas').forEach((canvas) => {
@@ -450,7 +535,7 @@
             }).catch(err => console.error('Download error:', err));
     </script> --}}
 
-    {{-- <script>
+{{-- <script>
         function downloadAllCharts(type) {
             // Tampilkan loading indicator
             const btn = event.target;
@@ -483,4 +568,3 @@
                 });
         }
     </script> --}}
-@endpush

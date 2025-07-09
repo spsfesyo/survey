@@ -1,0 +1,56 @@
+<table>
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Tanggal</th>
+
+            @foreach ($pertanyaanList as $pertanyaan)
+                <th>{{ $pertanyaan->pertanyaan }}</th>
+            @endforeach
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($respondents as $respondent)
+            <tr>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ \Carbon\Carbon::parse($respondent->created_at)->format('d-m-Y') }}</td>
+
+                @foreach ($pertanyaanList as $pertanyaan)
+                    @php
+                        if (
+                            $pertanyaan->master_tipe_pertanyaan_id == 5 &&
+                            $pertanyaan->reference
+                        ) {
+                            switch ($pertanyaan->reference) {
+                                case 'provinsi_id':
+                                    $jawaban = $respondent->provinsi->nama_provinsi ?? '-';
+                                    break;
+                                case 'kota_id':
+                                    $jawaban = $respondent->kota->kota ?? '-';
+                                    break;
+                                case 'jenis_pertanyaan_id':
+                                    $jawaban = $respondent->JenisPertanyaan->jenis_pertanyaan ?? '-';
+                                    break;
+                                default:
+                                    $jawaban = $respondent->{$pertanyaan->reference} ?? '-';
+                                    break;
+                            }
+                        } else {
+                            $jawaban = $respondent->answers
+                                ->where('master_pertanyaan_id', $pertanyaan->id)
+                                ->map(function ($a) {
+                                    $option = $a->options->options ?? null;
+                                    if (strtolower($option) === 'other' || strtolower($option) === 'lainnya') {
+                                        return $a->lainnya ?? 'Other';
+                                    }
+                                    return $option ?? ($a->jawaban_teks ?? $a->lainnya);
+                                })
+                                ->implode(', ');
+                        }
+                    @endphp
+                    <td>{{ $jawaban }}</td>
+                @endforeach
+            </tr>
+        @endforeach
+    </tbody>
+</table>

@@ -63,7 +63,8 @@
     <script src="{{ asset('library/jquery.nicescroll/dist/jquery.nicescroll.min.js') }}"></script>
     <script src="{{ asset('library/moment/min/moment.min.js') }}"></script>
     <script src="{{ asset('js/stisla.js') }}"></script>
-    <script src="{{ asset('library/chart.js/dist/Chart.min.js') }}"></script>
+   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+
 
 
     @stack('scripts')

@@ -23,10 +23,12 @@
                         </div>
                         <div class="card-body text-center">
 
-                            <img src="{{ asset('img/logo_blesscon.svg') }}" alt="logo" width="500">
+                            <img src="{{ asset('img/logo_blesscon.svg') }}" alt="logo" class="img-fluid"
+                                style="max-width: 100%; height: auto;">
 
                             <div class="mt-5">
-                                <p class="mb-0" style="font-size: 25px; font-weight:bold;">Selamat Datang di Dashboard Admin Survey Marketing</p>
+                                <p class="mb-0" style="font-size: 25px; font-weight:bold;">Selamat Datang di Dashboard
+                                    Admin Survey Marketing</p>
                             </div>
 
                         </div>
