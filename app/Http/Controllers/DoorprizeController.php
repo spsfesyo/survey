@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\MasterRespondent;
 
 class DoorprizeController extends Controller
 {
@@ -11,7 +12,8 @@ class DoorprizeController extends Controller
      */
     public function index()
     {
-        return view ('Admin.admin-doorprize');
+         $respondents = MasterRespondent::pluck('nama_respondent')->toArray();
+          return view('Admin.admin-doorprize', compact('respondents'));
     }
 
     /**

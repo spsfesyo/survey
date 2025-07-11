@@ -54,7 +54,7 @@
 
                         <div class="card card-primary">
                             <div class="card-header">
-                                <h4>Harga Produk Bata Ringan (Merek Blesscon atau Superior)</h4>
+                                <h4>Pengiriman Produk Bata Ringan (Merek Blesscon atau Superior)</h4>
                             </div>
 
                             <div class="card-body">
