@@ -186,6 +186,48 @@
                                         </div>
                                     @endforeach
 
+                                    {{-- Ambil Foto Pelayanan --}}
+                                    {{-- <div class="form-group">
+                                        <label><strong>Mohon Sertakan Foto (selfie pengisi survey/foto plang toko or
+                                                nota toko yg keliatan nama toko)</strong></label><br>
+                                        <video id="video" autoplay playsinline
+                                            style="width:100%; max-width:320px; border:1px solid #ccc;"></video><br>
+                                        <button type="button" class="btn btn-primary btn-sm mt-2"
+                                            id="startCamera">Mulai Kamera</button>
+                                        <button type="button" class="btn btn-success btn-sm mt-2" id="captureButton"
+                                            disabled>Ambil Foto</button>
+                                        <canvas id="canvas" style="display:none;"></canvas>
+                                        <img id="photoPreview" class="mt-2"
+                                            style="width:100%; max-width:320px; display:none;" alt="Preview Foto">
+                                        <input type="hidden" name="foto_data_url" id="fotoDataUrl">
+                                        @error('foto_data_url')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div> --}}
+
+                                    <div class="form-group">
+                                        <label><strong>Upload foto anda!</strong></label>
+
+                                        <div id="previewBox"
+                                            style="width: 100%; max-width: 300px; height: 250px; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 10px; background-color: #f8f9fa;">
+                                            <img id="previewImage" src="{{ asset('images/default-avatar.png') }}"
+                                                alt="Preview"
+                                                style="max-width: 100%; max-height: 100%; display: block;">
+                                        </div>
+
+                                        <button type="button" id="openCameraBtn" class="btn btn-primary"
+                                            data-toggle="modal" data-target="#kameraModal">
+                                            Ambil Foto
+                                        </button>
+
+                                        <button type="button" id="retakeBtn" class="btn btn-warning mt-2"
+                                            style="display: none;">
+                                            Ambil Ulang Foto
+                                        </button>
+
+                                        <!-- Hidden input -->
+                                        <input type="hidden" name="foto_base64" id="foto_base64">
+                                    </div>
                                     <div class="form-group d-flex justify-content-between">
                                         <a href="#" class="btn btn-outline-warning"
                                             onclick="document.getElementById('formSurveyPelayanan').reset(); return false;">Clear
@@ -209,6 +251,27 @@
             </div>
         </section>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="kameraModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content p-3">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ambil Foto</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body text-center">
+                    <video id="video" autoplay playsinline
+                        style="width: 100%; max-height: 300px; border: 1px solid #999;"></video>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    <br>
+                    <button type="button" class="btn btn-success mt-2" id="captureBtn">Ambil Gambar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <!-- General JS Scripts -->
     <script src="{{ asset('library/jquery/dist/jquery.min.js') }}"></script>
@@ -275,7 +338,7 @@
                         isValid = false;
                         messages.push(
                             `Pertanyaan ${id} minimal memilih ${batas} jawaban. Anda memilih ${checkedCount}.`
-                            );
+                        );
                     }
 
                     if (!batas && checkedCount === 0) {
@@ -295,5 +358,117 @@
             });
         });
     </script>
+
+    {{-- <script>
+        document.getElementById('startCamera').addEventListener('click', async () => {
+            const video = document.getElementById('video');
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                return alert(
+                    'API kamera tidak tersedia. Pastikan halaman menggunakan HTTPS atau diakses via localhost.'
+                );
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment'
+                    },
+                    audio: false
+                });
+                video.srcObject = stream;
+                document.getElementById('captureButton').disabled = false;
+            } catch (err) {
+                alert(`Gagal akses kamera: ${err.name}`);
+                console.error(err);
+            }
+        });
+
+        document.getElementById('captureButton').addEventListener('click', () => {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const photo = document.getElementById('photoPreview');
+            const context = canvas.getContext('2d');
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+
+            const dataUrl = canvas.toDataURL('image/jpeg');
+            photo.src = dataUrl;
+            photo.style.display = 'block';
+            document.getElementById('fotoDataUrl').value = dataUrl;
+
+            // Hentikan kamera
+            const stream = video.srcObject;
+            stream?.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+        });
+    </script> --}}
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const previewImage = document.getElementById('previewImage');
+        const fotoBase64Input = document.getElementById('foto_base64');
+        const openCameraBtn = document.getElementById('openCameraBtn');
+        const retakeBtn = document.getElementById('retakeBtn');
+
+        let streamRef = null;
+
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({
+                    video: true
+                })
+                .then(function(stream) {
+                    streamRef = stream;
+                    video.srcObject = stream;
+                })
+                .catch(function(err) {
+                    alert('Tidak bisa mengakses kamera: ' + err.message);
+                });
+        }
+
+        $('#kameraModal').on('shown.bs.modal', function() {
+            startCamera();
+        });
+
+        $('#kameraModal').on('hidden.bs.modal', function() {
+            if (streamRef) {
+                streamRef.getTracks().forEach(track => track.stop());
+                streamRef = null;
+            }
+        });
+
+        document.getElementById('captureBtn').addEventListener('click', function() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const dataURL = canvas.toDataURL('image/jpeg');
+
+            previewImage.src = dataURL;
+            fotoBase64Input.value = dataURL;
+
+            if (streamRef) {
+                streamRef.getTracks().forEach(track => track.stop());
+                streamRef = null;
+            }
+
+            openCameraBtn.style.display = 'none';
+            retakeBtn.style.display = 'inline-block';
+            $('#kameraModal').modal('hide');
+        });
+
+        retakeBtn.addEventListener('click', function() {
+            previewImage.src = "{{ asset('images/default-avatar.png') }}";
+            fotoBase64Input.value = "";
+            openCameraBtn.style.display = 'inline-block';
+            retakeBtn.style.display = 'none';
+            $('#kameraModal').modal('show');
+        });
+    </script>
+
+
+
+
 
 </html>

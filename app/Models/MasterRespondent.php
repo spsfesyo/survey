@@ -17,6 +17,7 @@ class MasterRespondent extends Model
         'telepone_respondent',
         'nama_toko_respondent',
         'alamat_toko_respondent',
+        'foto_selfie',
         'provinsi_id',
         'kota_id',
         'jenis_pertanyaan_id'
