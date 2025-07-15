@@ -19,7 +19,7 @@ class MasterRespondent extends Model
         'alamat_toko_respondent',
         'foto_selfie',
         'provinsi_id',
-        'kota_id',
+        'kabupaten_id',
         'jenis_pertanyaan_id'
 
     ];
@@ -30,9 +30,9 @@ class MasterRespondent extends Model
         return $this->belongsTo(MasterProvinsi::class, 'provinsi_id');
     }
 
-    public function kota()
+    public function kabupaten()
     {
-        return $this->belongsTo(MasterKotaSurvey::class, 'kota_id');
+        return $this->belongsTo(MasterKotaSurvey::class, 'kabupaten_id');
     }
 
     public function jenisPertanyaan()
