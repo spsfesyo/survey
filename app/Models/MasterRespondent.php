@@ -11,7 +11,7 @@ class MasterRespondent extends Model
     protected $table = 'master_respondent';
     protected $primaryKey = 'id';
     protected $fillable = [
-
+        'master_outlet_survey_id',
         'nama_respondent',
         'email_respondent',
         'telepone_respondent',
@@ -19,8 +19,9 @@ class MasterRespondent extends Model
         'alamat_toko_respondent',
         'foto_selfie',
         'provinsi_id',
-        'kabupaten_id',
-        'jenis_pertanyaan_id'
+        'master_kabupaten_id',
+        'jenis_pertanyaan_id',
+        'hadiah'
 
     ];
 
@@ -32,7 +33,7 @@ class MasterRespondent extends Model
 
     public function kabupaten()
     {
-        return $this->belongsTo(MasterKotaSurvey::class, 'kabupaten_id');
+        return $this->belongsTo(MasterKabupaten::class, 'master_kabupaten_id');
     }
 
     public function jenisPertanyaan()

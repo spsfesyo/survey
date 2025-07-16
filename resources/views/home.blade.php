@@ -10,76 +10,42 @@
 @section('main')
     <div class="card card-primary">
         <div class="card-header">
-            <h4>Masukkan Email Anda</h4>
+            <h4>Masukkan Kode Unik Anda</h4>
         </div>
 
         <div class="card-body">
-            <form method="POST" action="{{ route('submit-email') }}" class="needs-validation" novalidate="">
+            {{-- <form method="POST" action="{{ route('submit-unique-code') }}" class="needs-validation" novalidate> --}}
+                 <form method="POST" action="#" class="needs-validation" novalidate>
                 @csrf
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input id="email" type="email" class="form-control" name="email" tabindex="1" required
-                        autofocus>
-                    <div class="invalid-feedback">
-                        Email tidak boleh kosong
-                    </div>
-                </div>
 
-                {{-- <div class="form-group">
-                    <div class="d-block">
-                        <label for="password" class="control-label">Password</label>
-                        <div class="float-right">
-                            <a href="auth-forgot-password.html" class="text-small">
-                                Forgot Password?
-                            </a>
+                <div class="form-group">
+                    <label for="kode_unik">Kode Unik</label>
+                    <input id="kode_unik" type="text" class="form-control @error('kode_unik') is-invalid @enderror"
+                        name="kode_unik" maxlength="10" minlength="10" pattern="[A-Za-z0-9]{10}" tabindex="1" required
+                        autofocus value="{{ old('kode_unik') }}">
+                    <div class="invalid-feedback">
+                        Kode Unik harus 10 karakter alfanumerik.
+                    </div>
+                    @error('kode_unik')
+                        <div class="invalid-feedback d-block">
+                            {{ $message }}
                         </div>
-                    </div>
-                    <input id="password" type="password" class="form-control" name="password" tabindex="2" required>
-                    <div class="invalid-feedback">
-                        please fill in your password
-                    </div>
-                </div> --}}
-
-                <div class="form-group">
-                    {{-- <div class="custom-control custom-checkbox">
-                        <input type="checkbox" name="remember" class="custom-control-input" tabindex="3" id="remember-me">
-                        <label class="custom-control-label" for="remember-me">Remember Me</label>
-                    </div> --}}
+                    @enderror
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block" tabindex="4">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block" tabindex="2">
                         Kirim
                     </button>
                 </div>
             </form>
-            {{-- <div class="mt-4 mb-3 text-center">
-                <div class="text-job text-muted">Login With Social</div>
-            </div>
-            <div class="row sm-gutters">
-                <div class="col-6">
-                    <a class="btn btn-block btn-social btn-facebook">
-                        <span class="fab fa-facebook"></span> Facebook
-                    </a>
-                </div>
-                <div class="col-6">
-                    <a class="btn btn-block btn-social btn-twitter">
-                        <span class="fab fa-twitter"></span> Twitter
-                    </a>
-                </div>
-            </div> --}}
-
         </div>
     </div>
-    {{-- <div class="text-muted mt-5 text-center">
-        Don't have an account? <a href="auth-register.html">Create One</a>
-    </div> --}}
 @endsection
 
 @push('scripts')
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- JS Libraies -->
+
     @if (session('success'))
         <script>
             Swal.fire({
@@ -94,11 +60,23 @@
         <script>
             Swal.fire({
                 icon: 'error',
-                title: 'email telah terdaftar dan sudah pernah mengisi form surey gunakan email yang lain',
+                title: 'Gagal',
                 text: '{{ session('error') }}',
             });
         </script>
     @endif
 
-    <!-- Page Specific JS File -->
+    <script>
+        // Validasi form bootstrap
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.needs-validation');
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    </script>
 @endpush

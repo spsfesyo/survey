@@ -25,7 +25,7 @@ use App\Http\Controllers\DoorprizeController;
 
 Route::get('/', [RespondentController::class, 'index'])->name('home');
 
-Route::post('/submit-email', [RespondentController::class, 'create'])->name('submit-email');
+Route::post('/submit-kode-unik', [RespondentController::class, 'create'])->name('submit-kode-unik');
 
 Route::get('/form-utama', [RespondentController::class, 'getFormUtama'])->name('form-utama');
 Route::post('/form-utama', [RespondentController::class, 'answerFormUtama'])->name('post-form-utama');

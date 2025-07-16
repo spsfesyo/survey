@@ -9,6 +9,7 @@ use App\Models\MasterProvinsi;
 use App\Models\MasterKotaSurvey;
 use App\Models\MasterPertanyaan;
 use App\Models\MasterRespondent;
+use App\Models\MasterOutletSurvey;
 use Illuminate\Support\Facades\Log;
 use App\Models\MasterJenisPertanyaan;
 use Illuminate\Support\Facades\Session;
@@ -25,26 +26,22 @@ class RespondentController extends Controller
 
     public function create(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email'
-        ]);
+       $request->validate([
+        'kode_unik' => 'required|string|size:10'
+    ]);
 
-        // Cek apakah email sudah terdaftar
-        $existing = MasterRespondent::where('email_respondent', $request->email)->first();
+    $outlet = MasterOutletSurvey::where('kode_unik', $request->kode_unik)
+        ->where('status_kode_unik', 'Y')
+        ->first();
 
-        if ($existing) {
-            return redirect()->back()->with('error', 'Email sudah terdaftar!');
-        }
+    if (!$outlet) {
+        return redirect()->back()->with('error', 'Kode unik tidak valid atau sudah digunakan.');
+    }
 
-        // Simpan jika belum terdaftar
-        MasterRespondent::create([
-            'email_respondent' => $request->email,
-        ]);
+    Session::put('master_outlet_survey_id', $outlet->id);
+    Session::put('kode_unik', $request->kode_unik);
 
-        // Simpan ke session
-        Session::put('email_respondent', $request->email);
-
-        return redirect()->route('form-utama')->with('success', 'Email berhasil didaftarkan!');
+        return redirect()->route('form-utama')->with('success', 'Kode diterima. Silakan isi form.');
     }
 
     public function getFormUtama()
