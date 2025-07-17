@@ -12,7 +12,6 @@
         integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <!-- CSS Libraries -->
 
     <style>
         body {
@@ -40,9 +39,6 @@
 
         gtag('config', 'UA-94034622-3');
     </script>
-    <!-- /END GA -->
-
-
 </head>
 
 <body>
@@ -83,27 +79,18 @@
 
                                     <div class="form-group" style="margin-top: 20px;">
                                         <label>Provinsi Lokasi Toko</label>
-                                        <select class="form-control selectric" name="provinsi_id" required>
+                                        <select id="provinsi" name="provinsi" class="form-control">
                                             <option value="">-- Pilih Provinsi --</option>
-                                            @foreach ($provinsi as $prov)
-                                                <option value="{{ $prov->id }}"
-                                                    {{ ($sessionData['provinsi_id'] ?? '') == $prov->id ? 'selected' : '' }}>
-                                                    {{ $prov->nama_provinsi }}
-                                                </option>
+                                            @foreach ($provinsi as $item)
+                                                <option value="{{ $item->id }}">{{ $item->nama_provinsi }}</option>
                                             @endforeach
                                         </select>
                                     </div>
 
                                     <div class="form-group" style="margin-top: 20px;">
-                                        <label>Kota/Kabupaten Lokasi Toko</label>
-                                        <select class="form-control select-kota" name="kota_id" required>
-                                            <option value="">-- Pilih Kota --</option>
-                                            @foreach ($kota as $k)
-                                                <option value="{{ $k->id }}"
-                                                    {{ ($sessionData['kota_id'] ?? '') == $k->id ? 'selected' : '' }}>
-                                                    {{ $k->kota }}
-                                                </option>
-                                            @endforeach
+                                        <label>Kabupaten/Kota Lokasi Toko</label>
+                                        <select class="form-control" name="kabupaten" id="kabupaten" required>
+                                            <option value="">-- Pilih Kabupaten --</option>
                                         </select>
                                     </div>
 
@@ -121,15 +108,13 @@
                                             value="{{ $sessionData['telepone_respondent'] ?? '' }}" required
                                             placeholder="Contoh: 081234567890">
                                     </div>
+
                                     @foreach ($pertanyaanFormUtama as $pertanyaan)
                                         @php
                                             $tipeId = $pertanyaan->tipePertanyaan->id ?? null;
-
-                                            // Skip pertanyaan dengan tipe ID 5
                                             if ($tipeId == 5) {
                                                 continue;
                                             }
-
                                             $jawabanUtama = $sessionData['pertanyaan_' . $pertanyaan->id] ?? null;
                                         @endphp
 
@@ -244,17 +229,12 @@
                                         </div>
                                     @endforeach
 
-
-
-                                    {{-- Blesscon / Superior --}}
-
                                     <div class="form-group" style="margin-top:15px; font-weight:600;">
                                         <label class="d-block" style="font-weight:600; font-size: 0.85rem;">
                                             Selama ini Anda membeli merek apa dari Produk Bata Ringan kami?*
                                         </label>
 
                                         @php
-                                            $sessionData = session('form_utama', []);
                                             $selectedJenis = $sessionData['jenis_pertanyaan_id'] ?? null;
                                         @endphp
 
@@ -270,9 +250,7 @@
                                                 </label>
                                             </div>
                                         @endforeach
-
                                     </div>
-
 
                                     <div class="form-group d-flex justify-content-between">
                                         <a href="#" class="btn btn-outline-warning"
@@ -282,51 +260,60 @@
                                     </div>
 
                                 </form>
-
-                                {{-- <div class="form-group text-start">
-                                    <a href="#" class="btn btn-outline-warning">Warning</a>
-                                </div> --}}
                             </div>
                         </div>
-                        {{-- <div class="simple-footer">
-                            Copyright &copy; Stisla 2018
-                        </div> --}}
                     </div>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- General JS Scripts -->
+    <!-- General JS Scripts - URUTAN PENTING -->
     <script src="{{ asset('library/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ asset('library/popper.js/dist/umd/popper.js') }}"></script>
-    <script src="{{ asset('library/tooltip.js/dist/umd/tooltip.js') }}"></script>
     <script src="{{ asset('library/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('library/jquery.nicescroll/dist/jquery.nicescroll.min.js') }}"></script>
     <script src="{{ asset('library/moment/min/moment.min.js') }}"></script>
     <script src="{{ asset('js/stisla.js') }}"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- JS Libraies -->
-
-    <!-- Page Specific JS File -->
-
-    <!-- Template JS File -->
-    <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
+    <!-- HAPUS DUPLIKAT JQUERY -->
+     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
+    <!-- Custom Scripts -->
     <script>
-        $(document).ready(function() {
-            $('.select-kota').select2({
-                placeholder: "-- Pilih Kota --",
-                allowClear: true
-            });
+        $('#provinsi').on('change', function() {
+            let provinsiId = $(this).val();
+            $('#kabupaten').html('<option>Loading...</option>');
+
+            if (provinsiId) {
+                $.ajax({
+                    url: '/get-kabupaten/' + provinsiId,
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            $('#kabupaten').empty().append(
+                                '<option value="">-- Pilih Kabupaten --</option>');
+                            $.each(response.data, function(i, kab) {
+                                $('#kabupaten').append(
+                                    `<option value="${kab.id}">${kab.nama_kabupaten}</option>`
+                                    );
+                            });
+                        } else {
+                            alert('Gagal mengambil data kabupaten');
+                        }
+                    },
+                    error: function() {
+                        alert('Terjadi kesalahan saat mengambil data kabupaten.');
+                    }
+                });
+            } else {
+                $('#kabupaten').html('<option value="">-- Pilih Kabupaten --</option>');
+            }
         });
-    </script>
-
-    <script>
+        // Checkbox limit functionality
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.checkbox-wrapper').forEach(function(wrapper) {
                 const batas = parseInt(wrapper.dataset.batasPilihan);
@@ -350,6 +337,7 @@
                 enforceLimit();
             });
 
+            // Form validation
             document.querySelector('form')?.addEventListener('submit', function(e) {
                 let isValid = true;
                 document.querySelectorAll('input[name="required_checkbox[]"]').forEach(function(input) {
@@ -374,33 +362,27 @@
                 }
             });
         });
-    </script>
 
-
-    <script>
+        // Toggle other input
         function toggleOtherInput(input, id) {
             const textInput = document.getElementById('other_input_' + id);
             if (!textInput) return;
 
             if (input.type === 'radio') {
-                // Sembunyikan semua input lainnya dengan nama serupa
                 document.querySelectorAll(`input[id^="other_input_${id}"]`).forEach(el => el.style.display = 'none');
             }
 
             textInput.style.display = input.checked ? 'inline-block' : 'none';
 
-            // Kosongkan input jika tidak dicentang
             if (!input.checked) {
                 textInput.value = '';
             }
         }
-    </script>
 
-    <script>
+        // Form validation for required checkboxes
         document.querySelector('form').addEventListener('submit', function(e) {
             let isValid = true;
 
-            // Cek setiap checkbox group wajib
             document.querySelectorAll('input[name="required_checkbox[]"]').forEach(function(hiddenInput) {
                 let id = hiddenInput.value;
                 let checkboxes = document.querySelectorAll('.checkbox-group-' + id);
@@ -417,6 +399,18 @@
         });
     </script>
 
+    <!-- Load scripts.js TERAKHIR untuk menghindari tooltip error -->
+    {{-- <script>
+        // Override tooltip initialization to prevent errors
+        $(document).ready(function() {
+            // Only initialize tooltip if bootstrap is loaded
+            if (typeof $.fn.tooltip !== 'undefined') {
+                $('[data-toggle="tooltip"]').tooltip();
+            }
+        });
+    </script> --}}
+    <script src="{{ asset('js/scripts.js') }}"></script>
 
+</body>
 
 </html>

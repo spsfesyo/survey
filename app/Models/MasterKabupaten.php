@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class MasterKabupaten extends Model
 {
     use HasFactory;
-    protected $table ='master_kabupaten'; // nama tabel
+    protected $table = 'master_kabupaten'; // nama tabel
     protected $primaryKey = 'id'; // nama primary key
     protected $fillable = [
         'nama_kabupaten', // kolom yang dapat diisi
@@ -16,8 +16,12 @@ class MasterKabupaten extends Model
     ];
 
     public function respondents()
-        {
-            return $this->hasMany(MasterRespondent::class, 'kabupaten_id');
-        }
+    {
+        return $this->hasMany(MasterRespondent::class, 'master_kabupaten_id');
+    }
 
+    public function provinsi()
+    {
+        return $this->belongsTo(MasterProvinsi::class, 'provinsi_id', 'id');
+    }
 }

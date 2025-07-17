@@ -29,6 +29,8 @@ Route::post('/submit-kode-unik', [RespondentController::class, 'create'])->name(
 
 Route::get('/form-utama', [RespondentController::class, 'getFormUtama'])->name('form-utama');
 Route::post('/form-utama', [RespondentController::class, 'answerFormUtama'])->name('post-form-utama');
+Route::get('/get-kabupaten/{provinsi_id}', [RespondentController::class, 'getKabupatenByProvinsi'])->name('get-kabupaten');
+
 
 
 // Route::get('/form-utama',function () {

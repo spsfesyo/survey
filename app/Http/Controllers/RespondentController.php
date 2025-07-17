@@ -6,10 +6,12 @@ use Illuminate\Support\Str;
 use App\Models\AnswerSurvey;
 use Illuminate\Http\Request;
 use App\Models\MasterProvinsi;
+use App\Models\MasterKabupaten;
 use App\Models\MasterKotaSurvey;
 use App\Models\MasterPertanyaan;
 use App\Models\MasterRespondent;
 use App\Models\MasterOutletSurvey;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\MasterJenisPertanyaan;
 use Illuminate\Support\Facades\Session;
@@ -26,20 +28,20 @@ class RespondentController extends Controller
 
     public function create(Request $request)
     {
-       $request->validate([
-        'kode_unik' => 'required|string|size:10'
-    ]);
+        $request->validate([
+            'kode_unik' => 'required|string|size:10'
+        ]);
 
-    $outlet = MasterOutletSurvey::where('kode_unik', $request->kode_unik)
-        ->where('status_kode_unik', 'Y')
-        ->first();
+        $outlet = MasterOutletSurvey::where('kode_unik', $request->kode_unik)
+            ->where('status_kode_unik', 'Y')
+            ->first();
 
-    if (!$outlet) {
-        return redirect()->back()->with('error', 'Kode unik tidak valid atau sudah digunakan.');
-    }
+        if (!$outlet) {
+            return redirect()->back()->with('error', 'Kode unik tidak valid atau sudah digunakan.');
+        }
 
-    Session::put('master_outlet_survey_id', $outlet->id);
-    Session::put('kode_unik', $request->kode_unik);
+        Session::put('master_outlet_survey_id', $outlet->id);
+        Session::put('kode_unik', $request->kode_unik);
 
         return redirect()->route('form-utama')->with('success', 'Kode diterima. Silakan isi form.');
     }
@@ -50,7 +52,7 @@ class RespondentController extends Controller
         // Ambil data provinsi dan kota
 
         $provinsi = MasterProvinsi::all();
-        $kota = MasterKotaSurvey::all();
+        // $kota = MasterKotaSurvey::all();
         $pertanyaanFormUtama = MasterPertanyaan::with(['tipePertanyaan', 'options'])
             ->where('master_section_id', 1)
             ->orderBy('order')
@@ -63,7 +65,7 @@ class RespondentController extends Controller
         // dd($pertanyaans);
         // return view('form_utama', compact('pertanyaanFormUtama'));
 
-        return view('form-utama', compact('provinsi', 'kota', 'pertanyaanFormUtama', 'merekBataRingan'));
+        return view('form-utama', compact('provinsi',  'pertanyaanFormUtama', 'merekBataRingan'));
     }
 
 
@@ -77,6 +79,22 @@ class RespondentController extends Controller
 
         return redirect()->route('form-pertanyaan-kualitas');
     }
+
+
+    public function getKabupatenByProvinsi($provinsiId)
+    {
+        try {
+            $kabupaten = MasterKabupaten::where('provinsi_id', $provinsiId)->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $kabupaten
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
+
 
     public function getFormKualitas()
     {
@@ -160,32 +178,25 @@ class RespondentController extends Controller
     // }
     public function submitFinalAnswer(Request $request)
     {
-        // dd($request->foto_base64);
+        // Simpan form pelayanan dari request ke session
         $validated = $request->all();
         session(['form_pelayanan' => $validated]);
 
-
-        // dd([
-        //     'form_utama' => session('form_utama'),
-        //     'foto_base64' => session('form_utama')['foto_base64'] ?? null
-        // ]);
-
-
-        // Ambil semua jawaban dari session
+        // Ambil semua data dari session
         $formUtama      = session('form_utama');
         $formKualitas   = session('form_kualitas', []);
         $formHarga      = session('form_harga', []);
         $formPengiriman = session('form_pengiriman', []);
         $formPelayanan  = session('form_pelayanan', []);
 
-        // Ambil email dari SESSION
-        $email = session('email_respondent');
+        $outletId  = session('master_outlet_survey_id');
+        $kodeUnik  = session('kode_unik');
 
-        if (!$email) {
-            return redirect()->back()->with('error', 'Email respondent tidak ditemukan di sesi. Harap ulangi pendaftaran.');
+        if (!$outletId || !$kodeUnik || !$formUtama) {
+            return redirect()->route('home')->with('error', 'Sesi tidak lengkap. Silakan ulangi.');
         }
 
-        // Ambil base64 dari REQUEST LANGSUNG
+        // Proses base64 image
         $fotoBase64 = $request->input('foto_base64');
         $fotoPath = null;
 
@@ -202,21 +213,22 @@ class RespondentController extends Controller
             }
         }
 
-        // Simpan atau update ke master_respondent
+        // Cek apakah sudah ada respondent untuk kode unik ini
         $respondent = MasterRespondent::updateOrCreate(
-            ['email_respondent' => $email],
+            ['master_outlet_survey_id' => $outletId],
             [
-                'nama_respondent'        => $formUtama['nama_respondent'] ?? null,
-                'nama_toko_respondent'   => $formUtama['nama_toko_respondent'] ?? null,
-                'provinsi_id'            => $formUtama['provinsi_id'] ?? null,
-                'kota_id'                => $formUtama['kota_id'] ?? null,
-                'alamat_toko_respondent' => $formUtama['alamat_toko_respondent'] ?? null,
-                'telepone_respondent'    => $formUtama['telepone_respondent'] ?? null,
-                'jenis_pertanyaan_id'    => $formUtama['jenis_pertanyaan_id'] ?? null,
-                'foto_selfie'            => $fotoPath,
+                'nama_respondent'         => $formUtama['nama_respondent'] ?? null,
+                'nama_toko_respondent'    => $formUtama['nama_toko_respondent'] ?? null,
+                'provinsi_id'             => $formUtama['provinsi'] ?? null,
+                'master_kabupaten_id'     => $formUtama['kabupaten'] ?? null,
+                'alamat_toko_respondent'  => $formUtama['alamat_toko_respondent'] ?? null,
+                'telepone_respondent'     => $formUtama['telepone_respondent'] ?? null,
+                'jenis_pertanyaan_id'     => $formUtama['jenis_pertanyaan_id'] ?? null,
+                'foto_selfie'             => $fotoPath,
             ]
         );
 
+        // Simpan jawaban ke AnswerSurvey
         $respondentId = $respondent->id;
 
         $semuaJawaban = array_filter(
@@ -240,7 +252,7 @@ class RespondentController extends Controller
                         'lainnya'                => $semuaJawaban["pertanyaan_{$pertanyaanId}_$optionId"] ?? null,
                     ]);
                 }
-            } elseif (!is_null($value)) {
+            } else {
                 AnswerSurvey::create([
                     'master_respondent_id'   => $respondentId,
                     'master_pertanyaan_id'   => $pertanyaanId,
@@ -251,18 +263,144 @@ class RespondentController extends Controller
             }
         }
 
+        // Tandai kode unik sudah digunakan
+        MasterOutletSurvey::where('id', $outletId)
+            ->update(['status_kode_unik' => 'N']);
+
+        // Hapus semua session setelah submit
         session()->forget([
             'form_utama',
             'form_kualitas',
             'form_harga',
             'form_pelayanan',
             'form_pengiriman',
-            'email_respondent'
+            'master_outlet_survey_id',
+            'kode_unik',
         ]);
+
+        // Berikan notifikasi jika ada hadiah
+        $hadiah = $respondent->hadiah;
+        if ($hadiah) {
+            return redirect()->route('home')->with('success', "Selamat! Anda mendapatkan hadiah: $hadiah");
+        }
 
         return redirect()->route('home')->with('success', 'Terima kasih atas partisipasi Anda!');
     }
 }
+
+
+
+
+
+
+
+
+
+
+//  public function submitFinalAnswer(Request $request)
+//     {
+//         // dd($request->foto_base64);
+//         $validated = $request->all();
+//         session(['form_pelayanan' => $validated]);
+
+
+//         // dd([
+//         //     'form_utama' => session('form_utama'),
+//         //     'foto_base64' => session('form_utama')['foto_base64'] ?? null
+//         // ]);
+
+
+//         // Ambil semua jawaban dari session
+//         $formUtama      = session('form_utama');
+//         $formKualitas   = session('form_kualitas', []);
+//         $formHarga      = session('form_harga', []);
+//         $formPengiriman = session('form_pengiriman', []);
+//         $formPelayanan  = session('form_pelayanan', []);
+
+//         // Ambil email dari SESSION
+//         $email = session('email_respondent');
+
+//         if (!$email) {
+//             return redirect()->back()->with('error', 'Email respondent tidak ditemukan di sesi. Harap ulangi pendaftaran.');
+//         }
+
+//         // Ambil base64 dari REQUEST LANGSUNG
+//         $fotoBase64 = $request->input('foto_base64');
+//         $fotoPath = null;
+
+//         if (!empty($fotoBase64)) {
+//             try {
+//                 $base64 = preg_replace('#^data:image/\w+;base64,#i', '', $fotoBase64);
+//                 $imageData = base64_decode($base64);
+//                 $fileName = 'foto-respondent/' . Str::uuid() . '.jpg';
+
+//                 Storage::disk('public')->put($fileName, $imageData);
+//                 $fotoPath = 'storage/' . $fileName;
+//             } catch (\Exception $e) {
+//                 $fotoPath = null;
+//             }
+//         }
+
+//         // Simpan atau update ke master_respondent
+//         $respondent = MasterRespondent::updateOrCreate(
+//             ['email_respondent' => $email],
+//             [
+//                 'nama_respondent'        => $formUtama['nama_respondent'] ?? null,
+//                 'nama_toko_respondent'   => $formUtama['nama_toko_respondent'] ?? null,
+//                 'provinsi_id'            => $formUtama['provinsi_id'] ?? null,
+//                 'kota_id'                => $formUtama['kota_id'] ?? null,
+//                 'alamat_toko_respondent' => $formUtama['alamat_toko_respondent'] ?? null,
+//                 'telepone_respondent'    => $formUtama['telepone_respondent'] ?? null,
+//                 'jenis_pertanyaan_id'    => $formUtama['jenis_pertanyaan_id'] ?? null,
+//                 'foto_selfie'            => $fotoPath,
+//             ]
+//         );
+
+//         $respondentId = $respondent->id;
+
+//         $semuaJawaban = array_filter(
+//             array_merge($formUtama, $formKualitas, $formHarga, $formPelayanan, $formPengiriman),
+//             fn($value) => !is_null($value)
+//         );
+
+//         foreach ($semuaJawaban as $key => $value) {
+//             if (strpos($key, 'pertanyaan_') !== 0 || strpos($key, 'other_') !== false) continue;
+
+//             $pertanyaanId = str_replace('pertanyaan_', '', $key);
+
+//             if (is_array($value)) {
+//                 foreach ($value as $optionId) {
+//                     $isOther = strpos($optionId, 'other_') === 0;
+//                     AnswerSurvey::create([
+//                         'master_respondent_id'   => $respondentId,
+//                         'master_pertanyaan_id'   => $pertanyaanId,
+//                         'pertanyaan_options_id'  => $isOther ? intval(str_replace('other_', '', $optionId)) : intval($optionId),
+//                         'jawaban_teks'           => $semuaJawaban["teks_$pertanyaanId"] ?? null,
+//                         'lainnya'                => $semuaJawaban["pertanyaan_{$pertanyaanId}_$optionId"] ?? null,
+//                     ]);
+//                 }
+//             } elseif (!is_null($value)) {
+//                 AnswerSurvey::create([
+//                     'master_respondent_id'   => $respondentId,
+//                     'master_pertanyaan_id'   => $pertanyaanId,
+//                     'pertanyaan_options_id'  => is_numeric($value) ? intval($value) : null,
+//                     'jawaban_teks'           => is_numeric($value) ? ($semuaJawaban["teks_$pertanyaanId"] ?? null) : $value,
+//                     'lainnya'                => $semuaJawaban["lainnya_$pertanyaanId"] ?? null,
+//                 ]);
+//             }
+//         }
+
+//         session()->forget([
+//             'form_utama',
+//             'form_kualitas',
+//             'form_harga',
+//             'form_pelayanan',
+//             'form_pengiriman',
+//             'email_respondent'
+//         ]);
+
+//         return redirect()->route('home')->with('success', 'Terima kasih atas partisipasi Anda!');
+//     }
 
 
 

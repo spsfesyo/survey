@@ -18,4 +18,9 @@ class MasterProvinsi extends Model
     {
         return $this->hasMany(MasterRespondent::class, 'provinsi_id');
     }
+
+    public function kabupaten()
+    {
+        return $this->hasMany(MasterKabupaten::class, 'provinsi_id', 'id');
+    }
 }

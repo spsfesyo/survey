@@ -15,7 +15,7 @@
 
         <div class="card-body">
             {{-- <form method="POST" action="{{ route('submit-unique-code') }}" class="needs-validation" novalidate> --}}
-                 <form method="POST" action="#" class="needs-validation" novalidate>
+            <form method="POST" action="{{ route('submit-kode-unik') }}" class="needs-validation" novalidate>
                 @csrf
 
                 <div class="form-group">
