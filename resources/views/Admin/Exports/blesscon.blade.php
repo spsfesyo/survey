@@ -3,7 +3,7 @@
         <tr>
             <th>No</th>
             <th>Tanggal</th>
-
+            <th>Outlet</th>
             @foreach ($pertanyaanList as $pertanyaan)
                 <th>{{ $pertanyaan->pertanyaan }}</th>
             @endforeach
@@ -14,19 +14,16 @@
             <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ \Carbon\Carbon::parse($respondent->created_at)->format('d-m-Y') }}</td>
-
+                <td>{{ $respondent->outletSurvey->nama_outlet ?? '-' }}</td>
                 @foreach ($pertanyaanList as $pertanyaan)
                     @php
-                        if (
-                            $pertanyaan->master_tipe_pertanyaan_id == 5 &&
-                            $pertanyaan->reference
-                        ) {
+                        if ($pertanyaan->master_tipe_pertanyaan_id == 5 && $pertanyaan->reference) {
                             switch ($pertanyaan->reference) {
                                 case 'provinsi_id':
                                     $jawaban = $respondent->provinsi->nama_provinsi ?? '-';
                                     break;
-                                case 'kota_id':
-                                    $jawaban = $respondent->kota->kota ?? '-';
+                                case 'master_kabupaten_id':
+                                    $jawaban = $respondent->kabupaten->nama_kabupaten ?? '-';
                                     break;
                                 case 'jenis_pertanyaan_id':
                                     $jawaban = $respondent->JenisPertanyaan->jenis_pertanyaan ?? '-';

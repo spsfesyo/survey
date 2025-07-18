@@ -35,8 +35,9 @@ class AdminStatistikController extends Controller
         // Pagination untuk tabel responden - menggunakan pageName 'tabel'
         $respondentsPaginated = MasterRespondent::with([
             'provinsi',
-            'kota',
+            'kabupaten',
             'JenisPertanyaan',
+            'outletSurvey',
             'answers.options'
         ])->paginate(5, ['*'], 'tabel');
 
@@ -46,30 +47,35 @@ class AdminStatistikController extends Controller
         // Ambil respondent dengan jenis_pertanyaan_id = 1 (misal Blesscon)
         $respondentsJenis1 = MasterRespondent::with([
             'provinsi',
-            'kota',
+            'kabupaten',
             'JenisPertanyaan',
+            'outletSurvey',
             'answers.options'
         ])
             ->where('jenis_pertanyaan_id', 1)
             ->orderBy('created_at', 'desc') // ⬅️ tambahkan ini
             ->paginate(5, ['*'], 'tabel1');
 
+
         // Ambil respondent dengan jenis_pertanyaan_id = 2 (misal Superior)
         $respondentsJenis2 = MasterRespondent::with([
             'provinsi',
-            'kota',
+            'kabupaten',
             'JenisPertanyaan',
+            'outletSurvey',
             'answers.options'
         ])
             ->where('jenis_pertanyaan_id', 2)
             ->orderBy('created_at', 'desc') // ⬅️ tambahkan ini
             ->paginate(5, ['*'], 'tabel2');
+            // dd($respondentsJenis2);
 
         // Ambil semua data untuk chart (tidak perlu pagination di sini)
         $respondentsAll = MasterRespondent::with([
             'provinsi',
-            'kota',
+            'kabupaten',
             'JenisPertanyaan',
+            'outletSurvey',
             'answers.options'
         ])->get();
 
@@ -92,8 +98,8 @@ class AdminStatistikController extends Controller
                                 case 'provinsi_id':
                                     $value = $responden->provinsi->nama_provinsi ?? null;
                                     break;
-                                case 'kota_id':
-                                    $value = $responden->kota->kota ?? null;
+                                case 'master_kabupaten_id':
+                                    $value = $responden->kabupaten->nama_kabupaten ?? null;
                                     break;
                                 case 'jenis_pertanyaan_id':
                                     $value = $responden->JenisPertanyaan->jenis_pertanyaan ?? null;
@@ -222,8 +228,8 @@ class AdminStatistikController extends Controller
                                 case 'provinsi_id':
                                     $value = $responden->provinsi->nama_provinsi ?? null;
                                     break;
-                                case 'kota_id':
-                                    $value = $responden->kota->kota ?? null;
+                                case 'master_kabupaten_id':
+                                    $value = $responden->kabupaten->nama_kabupaten ?? null;
                                     break;
                                 case 'jenis_pertanyaan_id':
                                     $value = $responden->JenisPertanyaan->jenis_pertanyaan ?? null;

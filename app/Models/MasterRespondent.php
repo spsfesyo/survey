@@ -50,4 +50,8 @@ class MasterRespondent extends Model
     {
         return $this->hasMany(MasterPertanyaan::class, 'master_respondent_id');
     }
+    public function outletSurvey()
+    {
+        return $this->belongsTo(MasterOutletSurvey::class, 'master_outlet_survey_id');
+    }
 }

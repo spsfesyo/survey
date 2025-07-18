@@ -58,6 +58,7 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Tanggal</th>
+                                                <th>Outlet</th>
                                                 @foreach ($pertanyaanList as $pertanyaan)
                                                     <th>{{ $pertanyaan->pertanyaan }}</th>
                                                 @endforeach
@@ -70,6 +71,8 @@
                                                     </td>
                                                     <td>{{ \Carbon\Carbon::parse($respondent->created_at)->format('d-m-Y') }}
                                                     </td>
+                                                    <td>{{ $respondent->outletSurvey->nama_outlet ?? '-' }}</td>
+
                                                     @foreach ($pertanyaanList as $pertanyaan)
                                                         @php
                                                             if (
@@ -81,8 +84,11 @@
                                                                         $jawaban =
                                                                             $respondent->provinsi->nama_provinsi ?? '-';
                                                                         break;
-                                                                    case 'kota_id':
-                                                                        $jawaban = $respondent->kota->kota ?? '-';
+
+                                                                    case 'master_kabupaten_id':
+                                                                        $jawaban =
+                                                                            $respondent->kabupaten->nama_kabupaten ??
+                                                                            '-';
                                                                         break;
                                                                     case 'jenis_pertanyaan_id':
                                                                         $jawaban =
@@ -138,7 +144,8 @@
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="mb-0">Tabel Hasil Data Respondent Merek Superior</h4>
                                 <a href="{{ route('export.respondent', 2) }}
-                                " class="btn btn-icon icon-left btn-success">
+                                "
+                                    class="btn btn-icon icon-left btn-success">
                                     <i class="fas fa-download"></i> Excel
                                 </a>
                             </div>
@@ -150,6 +157,7 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Tanggal</th>
+                                                <th>Outlet</th>
                                                 @foreach ($pertanyaanList as $pertanyaan)
                                                     <th>{{ $pertanyaan->pertanyaan }}</th>
                                                 @endforeach
@@ -162,6 +170,7 @@
                                                     </td>
                                                     <td>{{ \Carbon\Carbon::parse($respondent->created_at)->format('d-m-Y') }}
                                                     </td>
+                                                    <td>{{ $respondent->outletSurvey->nama_outlet ?? '-' }}</td>
                                                     @foreach ($pertanyaanList as $pertanyaan)
                                                         @php
                                                             if (
@@ -173,8 +182,10 @@
                                                                         $jawaban =
                                                                             $respondent->provinsi->nama_provinsi ?? '-';
                                                                         break;
-                                                                    case 'kota_id':
-                                                                        $jawaban = $respondent->kota->kota ?? '-';
+                                                                    case 'master_kabupaten_id':
+                                                                        $jawaban =
+                                                                            $respondent->kabupaten->nama_kabupaten ??
+                                                                            '-';
                                                                         break;
                                                                     case 'jenis_pertanyaan_id':
                                                                         $jawaban =

@@ -17,7 +17,7 @@ class MasterKabupaten extends Model
 
     public function respondents()
     {
-        return $this->hasMany(MasterRespondent::class, 'master_kabupaten_id');
+        return $this->hasMany(MasterRespondent::class, 'master_kabupaten_id', 'id');
     }
 
     public function provinsi()
