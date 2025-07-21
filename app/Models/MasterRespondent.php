@@ -21,7 +21,7 @@ class MasterRespondent extends Model
         'provinsi_id',
         'master_kabupaten_id',
         'jenis_pertanyaan_id',
-        'hadiah'
+        'hadiah_id'
 
     ];
 
@@ -53,5 +53,9 @@ class MasterRespondent extends Model
     public function outletSurvey()
     {
         return $this->belongsTo(MasterOutletSurvey::class, 'master_outlet_survey_id');
+    }
+    public function hadiah()
+    {
+        return $this->belongsTo(MasterHadiah::class, 'hadiah_id');
     }
 }
