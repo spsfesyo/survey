@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
     <title>Form Pertanyaan</title>
+     <link rel="icon" type="image/png" href="{{ asset('img/icon-prima-no-bg.png') }}">
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('library/bootstrap/dist/css/bootstrap.min.css') }}">
@@ -359,6 +360,8 @@
         });
     </script>
 
+
+
     {{-- <script>
         document.getElementById('startCamera').addEventListener('click', async () => {
             const video = document.getElementById('video');
@@ -468,7 +471,16 @@
     </script>
 
 
-
+    @if (session('phone_duplicate'))
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Nomor Telepon Sudah Terdaftar!',
+                text: 'Nomor "{{ session('phone_duplicate') }}" sudah terdaftar. Harap gunakan nomor anda yang lain.',
+            });
+        </script>
+    @endif
 
 
 </html>

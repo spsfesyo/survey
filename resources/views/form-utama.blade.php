@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title></title>
+    <title>Form Pertanyaan</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/icon-prima-no-bg.png') }}">
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('library/bootstrap/dist/css/bootstrap.min.css') }}">
@@ -277,10 +278,11 @@
     <script src="{{ asset('js/stisla.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
     <!-- HAPUS DUPLIKAT JQUERY -->
-     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
     <!-- Custom Scripts -->
     <script>
@@ -299,7 +301,7 @@
                             $.each(response.data, function(i, kab) {
                                 $('#kabupaten').append(
                                     `<option value="${kab.id}">${kab.nama_kabupaten}</option>`
-                                    );
+                                );
                             });
                         } else {
                             alert('Gagal mengambil data kabupaten');
@@ -398,6 +400,10 @@
             }
         });
     </script>
+
+
+
+
 
     <!-- Load scripts.js TERAKHIR untuk menghindari tooltip error -->
     {{-- <script>
