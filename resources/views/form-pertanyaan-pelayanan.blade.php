@@ -52,7 +52,7 @@
                     <div
                         class="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
                         <div class="login-brand">
-                            <img src="{{ asset('img/logo_blesscon.svg') }}" alt="logo" width="300">
+                            <img src="{{ asset('img/logo-superior-prima-sukses-no-bg.png') }}" alt="logo" width="300">
                         </div>
 
                         <div class="card card-primary">
@@ -187,25 +187,6 @@
                                         </div>
                                     @endforeach
 
-                                    {{-- Ambil Foto Pelayanan --}}
-                                    {{-- <div class="form-group">
-                                        <label><strong>Mohon Sertakan Foto (selfie pengisi survey/foto plang toko or
-                                                nota toko yg keliatan nama toko)</strong></label><br>
-                                        <video id="video" autoplay playsinline
-                                            style="width:100%; max-width:320px; border:1px solid #ccc;"></video><br>
-                                        <button type="button" class="btn btn-primary btn-sm mt-2"
-                                            id="startCamera">Mulai Kamera</button>
-                                        <button type="button" class="btn btn-success btn-sm mt-2" id="captureButton"
-                                            disabled>Ambil Foto</button>
-                                        <canvas id="canvas" style="display:none;"></canvas>
-                                        <img id="photoPreview" class="mt-2"
-                                            style="width:100%; max-width:320px; display:none;" alt="Preview Foto">
-                                        <input type="hidden" name="foto_data_url" id="fotoDataUrl">
-                                        @error('foto_data_url')
-                                            <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div> --}}
-
                                     <div class="form-group">
                                         <label><strong>Upload foto anda!</strong></label>
 
@@ -283,15 +264,7 @@
     <script src="{{ asset('library/moment/min/moment.min.js') }}"></script>
     <script src="{{ asset('js/stisla.js') }}"></script>
 
-    <!-- Validasi & Logika Form -->
-    {{-- <!-- General JS Scripts -->
-    <script src="{{ asset('library/jquery/dist/jquery.min.js') }}"></script>
-    <script src="{{ asset('library/popper.js/dist/umd/popper.js') }}"></script>
-    <script src="{{ asset('library/tooltip.js/dist/umd/tooltip.js') }}"></script>
-    <script src="{{ asset('library/bootstrap/dist/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('library/jquery.nicescroll/dist/jquery.nicescroll.min.js') }}"></script>
-    <script src="{{ asset('library/moment/min/moment.min.js') }}"></script>
-    <script src="{{ asset('js/stisla.js') }}"></script> --}}
+
 
     <!-- Validasi & Logika Form -->
     <script>
@@ -360,54 +333,6 @@
         });
     </script>
 
-
-
-    {{-- <script>
-        document.getElementById('startCamera').addEventListener('click', async () => {
-            const video = document.getElementById('video');
-
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                return alert(
-                    'API kamera tidak tersedia. Pastikan halaman menggunakan HTTPS atau diakses via localhost.'
-                );
-            }
-
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: 'environment'
-                    },
-                    audio: false
-                });
-                video.srcObject = stream;
-                document.getElementById('captureButton').disabled = false;
-            } catch (err) {
-                alert(`Gagal akses kamera: ${err.name}`);
-                console.error(err);
-            }
-        });
-
-        document.getElementById('captureButton').addEventListener('click', () => {
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            const photo = document.getElementById('photoPreview');
-            const context = canvas.getContext('2d');
-
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0);
-
-            const dataUrl = canvas.toDataURL('image/jpeg');
-            photo.src = dataUrl;
-            photo.style.display = 'block';
-            document.getElementById('fotoDataUrl').value = dataUrl;
-
-            // Hentikan kamera
-            const stream = video.srcObject;
-            stream?.getTracks().forEach(track => track.stop());
-            video.srcObject = null;
-        });
-    </script> --}}
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
@@ -470,7 +395,7 @@
         });
     </script>
 
-
+{{-- 
     @if (session('phone_duplicate'))
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
@@ -480,7 +405,88 @@
                 text: 'Nomor "{{ session('phone_duplicate') }}" sudah terdaftar. Harap gunakan nomor anda yang lain.',
             });
         </script>
-    @endif
+    @endif --}}
 
 
 </html>
+
+
+
+    {{-- <script>
+        document.getElementById('startCamera').addEventListener('click', async () => {
+            const video = document.getElementById('video');
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                return alert(
+                    'API kamera tidak tersedia. Pastikan halaman menggunakan HTTPS atau diakses via localhost.'
+                );
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment'
+                    },
+                    audio: false
+                });
+                video.srcObject = stream;
+                document.getElementById('captureButton').disabled = false;
+            } catch (err) {
+                alert(`Gagal akses kamera: ${err.name}`);
+                console.error(err);
+            }
+        });
+
+        document.getElementById('captureButton').addEventListener('click', () => {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const photo = document.getElementById('photoPreview');
+            const context = canvas.getContext('2d');
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+
+            const dataUrl = canvas.toDataURL('image/jpeg');
+            photo.src = dataUrl;
+            photo.style.display = 'block';
+            document.getElementById('fotoDataUrl').value = dataUrl;
+
+            // Hentikan kamera
+            const stream = video.srcObject;
+            stream?.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+        });
+    </script> --}}
+
+
+
+        <!-- Validasi & Logika Form -->
+    {{-- <!-- General JS Scripts -->
+    <script src="{{ asset('library/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ asset('library/popper.js/dist/umd/popper.js') }}"></script>
+    <script src="{{ asset('library/tooltip.js/dist/umd/tooltip.js') }}"></script>
+    <script src="{{ asset('library/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('library/jquery.nicescroll/dist/jquery.nicescroll.min.js') }}"></script>
+    <script src="{{ asset('library/moment/min/moment.min.js') }}"></script>
+    <script src="{{ asset('js/stisla.js') }}"></script> --}}
+
+
+         {{-- Ambil Foto Pelayanan --}}
+                                    {{-- <div class="form-group">
+                                        <label><strong>Mohon Sertakan Foto (selfie pengisi survey/foto plang toko or
+                                                nota toko yg keliatan nama toko)</strong></label><br>
+                                        <video id="video" autoplay playsinline
+                                            style="width:100%; max-width:320px; border:1px solid #ccc;"></video><br>
+                                        <button type="button" class="btn btn-primary btn-sm mt-2"
+                                            id="startCamera">Mulai Kamera</button>
+                                        <button type="button" class="btn btn-success btn-sm mt-2" id="captureButton"
+                                            disabled>Ambil Foto</button>
+                                        <canvas id="canvas" style="display:none;"></canvas>
+                                        <img id="photoPreview" class="mt-2"
+                                            style="width:100%; max-width:320px; display:none;" alt="Preview Foto">
+                                        <input type="hidden" name="foto_data_url" id="fotoDataUrl">
+                                        @error('foto_data_url')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div> --}}

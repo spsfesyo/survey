@@ -193,8 +193,11 @@ class RespondentController extends Controller
         $formUtama = session('form_utama', []);
         $phone = $formUtama['telepone_respondent'] ?? null;
         if ($phone && MasterRespondent::where('telepone_respondent', $phone)->exists()) {
+
+            // $jawabanSebelumnya = session('jawaban');
+            // session(['jawaban' => $jawabanSebelumnya]);
             return redirect()
-                ->route('form-pertanyaan-pelayanan')  // route menuju form terakhir
+                ->route('form-pertanyaan-pelayanan')  // ⛔ ini redirect ke form terakhir
                 ->with('phone_duplicate', $phone)
                 ->withInput();
         }

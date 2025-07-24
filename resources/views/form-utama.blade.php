@@ -50,7 +50,8 @@
                     <div
                         class="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
                         <div class="login-brand">
-                            <img src="{{ asset('img/logo_blesscon.svg') }}" alt="logo" width="300">
+                            <img src="{{ asset('img/logo-superior-prima-sukses-no-bg.png') }}" alt="logo"
+                                width="300">
                         </div>
 
                         <div class="card card-primary">
@@ -401,7 +402,17 @@
         });
     </script>
 
-
+    @if (session('phone_duplicate'))
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Nomor Telepon Sudah Terdaftar',
+                text: 'Nomor {{ session('phone_duplicate') }} tidak valid (salah) atau sudah pernah digunakan. Silakan gunakan nomor lain.',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    @endif
 
 
 
