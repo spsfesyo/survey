@@ -1,7 +1,7 @@
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand">
-            <a href="{{route('admin-dashboard')}}">
+            <a href="{{ route('admin-dashboard') }}">
 
                 <img src="{{ asset('img/logo_blesscon.svg') }}" alt="Logo" style="height: 40px;">
             </a>
@@ -12,8 +12,8 @@
         <ul class="sidebar-menu">
             <li class="menu-header">Dashboard</li>
             <li class="nav-item dropdown ">
-                <a href="{{ route('admin-dashboard') }}"
-                    class="nav-link "><i class="fas fa-fire"></i><span>Dashboard</span></a>
+                <a href="{{ route('admin-dashboard') }}" class="nav-link "><i
+                        class="fas fa-fire"></i><span>Dashboard</span></a>
                 {{-- <ul class="dropdown-menu">
                     <li class=''>
                         <a class="nav-link"
@@ -27,19 +27,30 @@
             </li>
 
             <li class="{{ Request::is('admin-statistik') ? 'active' : '' }}">
-                <a class="nav-link"
-                    href="{{ route('admin-statistik') }}"><i class="fas fa-calculator"></i> <span>Statistik</span></a>
+                <a class="nav-link" href="{{ route('admin-statistik') }}"><i class="fas fa-calculator"></i>
+                    <span>Statistik</span></a>
             </li>
 
-             <li class="{{ Request::is('admin-doorprize') ? 'active' : '' }}">
-                <a class="nav-link"
-                    href="{{ route('admin-doorprize') }}"><i class="fas fa-gift"></i> <span>Doorprize</span></a>
+            <li class="{{ Request::is('admin-doorprize') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin-doorprize') }}"><i class="fas fa-gift"></i>
+                    <span>Doorprize</span></a>
             </li>
+
+
+            {{-- Menu khusus untuk Role ID 1 (Admin) --}}
+            @if (auth()->user()->role_id == 1)
+                <li class="{{ Request::is('admin-blast-wa') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('admin-blast-wa') }}">
+                        <i class="fas fa-users-cog"></i> <span>Blasting Wa</span>
+                    </a>
+                </li>
+            @endif
+
             {{-- <li class="{{ Request::is('admin-statistik') ? 'active' : '' }}">
                 <a class="nav-link"
                     href="{{ route('admin-statistik') }}"><i class="fas fa-calculator"></i> <span>Statistik</span></a>
             </li> --}}
-           {{--  <li class="menu-header">Starter</li>
+            {{--  <li class="menu-header">Starter</li>
             <li class="nav-item dropdown {{ $type_menu === 'layout' ? 'active' : '' }}">
                 <a href="#"
                     class="nav-link has-dropdown"

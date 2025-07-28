@@ -4,9 +4,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\testController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\DoorprizeController;
+use App\Http\Controllers\AdminBlastController;
 use App\Http\Controllers\RespondentController;
 use App\Http\Controllers\AdminStatistikController;
-use App\Http\Controllers\DoorprizeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,7 +70,7 @@ Route::post('/form-pertanyaan-pelayanan', [RespondentController::class, 'submitF
 Route::get('/auth-admin-survey', [AdminAuthController::class, 'showLogin'])->name('login');
 Route::post('/auth-admin-survey', [AdminAuthController::class, 'login']);
 Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:1,2'])->group(function () {
 
     Route::get('/admin-dashboard', [AdminAuthController::class, 'showDashboard'])->name('admin-dashboard');
     Route::get('/admin-statistik', [AdminStatistikController::class, 'showStatistik'])->name('admin-statistik');
@@ -79,6 +80,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/statistik/pie-data', [AdminStatistikController::class, 'downloadPieCharts'])->name('download-pie-charts');
     Route::get('/export-respondent/{jenisId}', [AdminStatistikController::class, 'ExportExcel'])->name('export.respondent');
     Route::get('/admin-doorprize', [DoorprizeController::class, 'index'])->name('admin-doorprize');
+});
+
+Route::middleware(['auth', 'role:1'])->group(function () {
+    Route::get('/admin-blast-wa', [AdminBlastController::class, 'index'])->name('admin-blast-wa');
+    Route::post('/admin-blast-wa', [AdminBlastController::class, 'BlastingWa'])->name('admin-blast-wa.post');
 });
 
 // Route::middleware('auth:survey')->get('/dashboard', function () {
