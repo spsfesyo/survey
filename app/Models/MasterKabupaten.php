@@ -15,6 +15,8 @@ class MasterKabupaten extends Model
         'provinsi_id', // kolom yang dapat diisi
     ];
 
+
+
     public function respondents()
     {
         return $this->hasMany(MasterRespondent::class, 'master_kabupaten_id', 'id');
@@ -24,4 +26,22 @@ class MasterKabupaten extends Model
     {
         return $this->belongsTo(MasterProvinsi::class, 'provinsi_id', 'id');
     }
+
+    public function outletSurvey()
+    {
+        return $this->hasMany(MasterOutletSurvey::class, 'master_kabupaten_id', 'id');
+    }
+    public function plotHadiah()
+    {
+        return $this->hasMany(PlotHadiahSurvey::class, 'master_kabupaten_id', 'id');
+    }
+    public function aturanHadiah()
+    {
+        return $this->hasMany(AturanHadiahSurvey::class, 'master_kabupaten_id', 'id');
+    }
+    public function historyPemenang()
+    {
+        return $this->hasMany(HistoryPemenangSurvey::class, 'master_kabupaten_id', 'id');
+    }
+
 }

@@ -39,12 +39,21 @@
 
             {{-- Menu khusus untuk Role ID 1 (Admin) --}}
             @if (auth()->user()->role_id == 1)
+                <li class="{{ Request::is('admin-plot-random') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('admin-plot-random') }}">
+                        <i class="fas fa-random"></i> <span>Plotting Random</span>
+                    </a>
+                </li>
+                
                 <li class="{{ Request::is('admin-blast-wa') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('admin-blast-wa') }}">
                         <i class="fas fa-users-cog"></i> <span>Blasting Wa</span>
                     </a>
                 </li>
             @endif
+
+
+
 
             {{-- <li class="{{ Request::is('admin-statistik') ? 'active' : '' }}">
                 <a class="nav-link"

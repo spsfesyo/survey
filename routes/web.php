@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\testController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminPlotController;
 use App\Http\Controllers\DoorprizeController;
 use App\Http\Controllers\AdminBlastController;
 use App\Http\Controllers\RespondentController;
@@ -85,6 +86,7 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
 Route::middleware(['auth', 'role:1'])->group(function () {
     Route::get('/admin-blast-wa', [AdminBlastController::class, 'index'])->name('admin-blast-wa');
     Route::post('/admin-blast-wa', [AdminBlastController::class, 'BlastingWa'])->name('admin-blast-wa.post');
+    Route::get('/admin-plot-random', [AdminPlotController::class, 'index'])->name('admin-plot-random');
 });
 
 // Route::middleware('auth:survey')->get('/dashboard', function () {

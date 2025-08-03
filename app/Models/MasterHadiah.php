@@ -21,4 +21,18 @@ class MasterHadiah extends Model
     {
         return $this->hasMany(MasterRespondent::class, 'hadiah_id');
     }
+
+    public function aturanHadiah()
+    {
+        return $this->hasMany(AturanHadiahSurvey::class, 'hadiah_id');
+    }
+    public function plotHadiah()
+    {
+        return $this->hasMany(PlotHadiahSurvey::class, 'hadiah_id', 'id');
+    }
+    public function historyPemenang()
+    {
+        return $this->hasMany(HistoryPemenangSurvey::class, 'hadiah_id', 'id');
+    }
+
 }
