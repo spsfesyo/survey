@@ -37,53 +37,53 @@ class SendWhatsappBlastJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info("🟡 [Job Start] WA Blast untuk record ID: {$this->recordId}");
+        // Log::info("🟡 [Job Start] WA Blast untuk record ID: {$this->recordId}");
 
-        $record = CheckBlast::find($this->recordId);
+        // $record = CheckBlast::find($this->recordId);
 
-        if (!$record) {
-            Log::warning("⚠️ Record ID {$this->recordId} tidak ditemukan.");
-            return;
-        }
+        // if (!$record) {
+        //     Log::warning("⚠️ Record ID {$this->recordId} tidak ditemukan.");
+        //     return;
+        // }
 
-        if ($record->status_blast_wa === 'true') {
-            Log::info("✅ Record ID {$this->recordId} sudah diblast. Skip.");
-            return;
-        }
+        // if ($record->status_blast_wa === 'true') {
+        //     Log::info("✅ Record ID {$this->recordId} sudah diblast. Skip.");
+        //     return;
+        // }
 
-        $helper = new WhatsappHelper();
-        $wa = $record->no_telp_check;
-        $kode = $record->kode_unik;
-        $link = $this->linkSurvey . '?code=' . $kode;
+        // $helper = new WhatsappHelper();
+        // $wa = $record->no_telp_check;
+        // $kode = $record->kode_unik;
+        // $link = $this->linkSurvey . '?code=' . $kode;
 
-        try {
-            $sendResult = $helper->sendSurveyMessageWithMedia($wa, $kode, $link);
+        // try {
+        //     $sendResult = $helper->sendSurveyMessageWithMedia($wa, $kode, $link);
 
-            if ($sendResult['success']) {
-                $record->update([
-                    'status_blast_wa' => 'true',
-                    'blast_status' => 'sent',
-                    'blast_sent_at' => now(),
-                    'blast_error' => null,
-                ]);
+        //     if ($sendResult['success']) {
+        //         $record->update([
+        //             'status_blast_wa' => 'true',
+        //             'blast_status' => 'sent',
+        //             'blast_sent_at' => now(),
+        //             'blast_error' => null,
+        //         ]);
 
-                Log::info("✅ WA berhasil dikirim ke: {$wa}");
-            } else {
-                $record->update([
-                    'blast_status' => 'failed',
-                    'blast_error' => $sendResult['error'] ?? 'Unknown error'
-                ]);
+        //         Log::info("✅ WA berhasil dikirim ke: {$wa}");
+        //     } else {
+        //         $record->update([
+        //             'blast_status' => 'failed',
+        //             'blast_error' => $sendResult['error'] ?? 'Unknown error'
+        //         ]);
 
-                Log::error("❌ Gagal kirim WA ke: {$wa}. Error: " . ($sendResult['error'] ?? 'Unknown'));
-            }
-        } catch (\Exception $e) {
-            $record->update([
-                'blast_status' => 'failed',
-                'blast_error' => $e->getMessage()
-            ]);
+        //         Log::error("❌ Gagal kirim WA ke: {$wa}. Error: " . ($sendResult['error'] ?? 'Unknown'));
+        //     }
+        // } catch (\Exception $e) {
+        //     $record->update([
+        //         'blast_status' => 'failed',
+        //         'blast_error' => $e->getMessage()
+        //     ]);
 
-            Log::error("🔥 Exception saat kirim WA ID {$this->recordId}: " . $e->getMessage());
-        }
+        //     Log::error("🔥 Exception saat kirim WA ID {$this->recordId}: " . $e->getMessage());
+        // }
     }
 
     /**
@@ -91,10 +91,10 @@ class SendWhatsappBlastJob implements ShouldQueue
      */
     public function failed(Throwable $exception): void
     {
-        Log::error('🚨 WA Blast Job failed permanently', [
-            'record_id' => $this->recordId,
-            'error' => $exception->getMessage(),
-        ]);
+        // Log::error('🚨 WA Blast Job failed permanently', [
+        //     'record_id' => $this->recordId,
+        //     'error' => $exception->getMessage(),
+        // ]);
     }
 }
 
