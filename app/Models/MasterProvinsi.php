@@ -23,9 +23,13 @@ class MasterProvinsi extends Model
     {
         return $this->hasMany(MasterKabupaten::class, 'provinsi_id', 'id');
     }
-  
+
     public function plotHadiah()
     {
         return $this->hasMany(PlotHadiahSurvey::class, 'provinsi_id', 'id');
+    }
+    public function area()
+    {
+        return $this->hasMany(MasterAreaSurvey::class, 'master_provinsi_id', 'id');
     }
 }

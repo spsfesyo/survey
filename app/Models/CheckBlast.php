@@ -15,5 +15,6 @@ class CheckBlast extends Model
         'nama_check',
         'no_telp_check',
         'kode_unik',
+        'status_blast_wa',
     ];
 }

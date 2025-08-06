@@ -18,6 +18,8 @@ class MasterOutletSurvey extends Model
         'kode_unik',
         'status_kode_unik',
         'periode', // Periode survey, nullable
+        'status_blast_wa', // Status blast WA, default 'false'
+        'master_area_id', // Foreign key to master_area
     ];
 
     public function kabupaten()
@@ -38,6 +40,10 @@ class MasterOutletSurvey extends Model
     public function historyPemenang()
     {
         return $this->hasMany(HistoryPemenangSurvey::class, 'mater_outlet_survey_id', 'id'); // ikut nama kolom di migration (typo)
+    }
+    public function area()
+    {
+        return $this->belongsTo(MasterAreaSurvey::class, 'master_area_id', 'id');
     }
 
 }

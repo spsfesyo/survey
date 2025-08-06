@@ -9,6 +9,19 @@
 @endpush
 
 @section('main')
+
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    @if (session('warning'))
+        <div class="alert alert-warning">{{ session('warning') }}</div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+    
     <div class="main-content">
         <section class="section">
             <div class="section-header">
@@ -28,16 +41,17 @@
                                 @csrf
                                 <button class="btn btn-primary rounded-circle mb-4"
                                     style="width: 80px; height: 80px; font-size: 24px;">
-                                    <i class="fas fa-paper-plane" style="font-size: 32px;" type="submit"></i> {{-- Ganti ikon sesuai kebutuhan --}}
+                                    <i class="fas fa-paper-plane" style="font-size: 32px;" type="submit"></i>
+                                    {{-- Ganti ikon sesuai kebutuhan --}}
                                 </button>
                             </form>
 
-                                <!-- Tulisan di bawah tombol -->
-                                <div>
-                                    <p class="mb-0" style="font-size: 25px; font-weight:bold;">Tekan Untuk Mulai Blasting
-                                        Pesan
-                                    </p>
-                                </div>
+                            <!-- Tulisan di bawah tombol -->
+                            <div>
+                                <p class="mb-0" style="font-size: 25px; font-weight:bold;">Tekan Untuk Mulai Blasting
+                                    Pesan
+                                </p>
+                            </div>
 
                         </div>
                     </div>
