@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\testController;
+use App\Http\Controllers\AdminBlastManual;
+use App\Http\Controllers\AdminStatusOutlet;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminPlotController;
 use App\Http\Controllers\DoorprizeController;
@@ -81,12 +83,14 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
     Route::get('/admin/statistik/pie-data', [AdminStatistikController::class, 'downloadPieCharts'])->name('download-pie-charts');
     Route::get('/export-respondent/{jenisId}', [AdminStatistikController::class, 'ExportExcel'])->name('export.respondent');
     Route::get('/admin-doorprize', [DoorprizeController::class, 'index'])->name('admin-doorprize');
+    Route::get('/admin-status-outlet', [AdminStatusOutlet::class, 'index'])->name('admin-status-outlet');
 });
 
 Route::middleware(['auth', 'role:1'])->group(function () {
     Route::get('/admin-blast-wa', [AdminBlastController::class, 'index'])->name('admin-blast-wa');
     Route::post('/admin-blast-wa', [AdminBlastController::class, 'BlastingWa'])->name('admin-blast-wa.post');
     Route::get('/admin-plot-random', [AdminPlotController::class, 'index'])->name('admin-plot-random');
+    Route::get('/admin-blast-manual', [AdminBlastManual::class, 'index'])->name('admin-blast-manual');
 });
 
 // Route::middleware('auth:survey')->get('/dashboard', function () {

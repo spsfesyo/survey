@@ -36,6 +36,11 @@
                     <span>Doorprize</span></a>
             </li>
 
+            <li class="{{ Request::is('admin-status-outlet') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin-status-outlet') }}">
+                    <i class="fas fa-bar-chart"></i> <span>Status Outlet</span>
+                </a>
+            </li>
 
             {{-- Menu khusus untuk Role ID 1 (Admin) --}}
             @if (auth()->user()->role_id == 1)
@@ -44,7 +49,13 @@
                         <i class="fas fa-random"></i> <span>Plotting Random</span>
                     </a>
                 </li>
-                
+
+                <li class="{{ Request::is('admin-blast-manual') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('admin-blast-manual') }}">
+                        <i class="fas fa-table"></i> <span>Blasting Manual</span>
+                    </a>
+                </li>
+
                 <li class="{{ Request::is('admin-blast-wa') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('admin-blast-wa') }}">
                         <i class="fas fa-users-cog"></i> <span>Blasting Wa</span>
