@@ -11,6 +11,8 @@ use App\Models\MasterOutletSurvey;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+
 
 class AdminBlastController extends Controller
 {
@@ -27,8 +29,9 @@ class AdminBlastController extends Controller
 
     public function index()
     {
+        $remaining = MasterOutletSurvey::where('status_blast_wa', 'false')->count();
 
-        return view('Admin.admin-blast-wa');
+        return view('Admin.admin-blast-wa', compact('remaining'));
     }
 
 
@@ -36,12 +39,18 @@ class AdminBlastController extends Controller
     public function BlastingWa(Request $request)
     {
         try {
-            $batchSize = 1000;
+            $batchSize = 100;
             $linkSurvey = "https://survey.superiorprimasukses.co.id/";
 
+            // Cek stop flag
+            if (Cache::get('blast_stop_flag', false)) {
+                return redirect()->back()->with('warning', 'Blasting WA sedang dihentikan sementara.');
+            }
+
             $dataToBlast = MasterOutletSurvey::where('status_blast_wa', 'false')
-                ->whereNotNull('telepone_outlet')
+                ->whereNotNull('telepon_outlet')
                 ->whereNotNull('kode_unik')
+                ->orderBy('id', 'asc')
                 ->limit($batchSize)
                 ->get();
 
@@ -54,30 +63,25 @@ class AdminBlastController extends Controller
             $failCount = 0;
 
             foreach ($dataToBlast as $record) {
+                // Cek stop flag sebelum mengirim setiap pesan
+                if (Cache::get('blast_stop_flag', false)) {
+                    break; // berhenti sementara
+                }
+
                 $wa = $record->telepone_outlet;
                 $kode = $record->kode_unik;
-                $surveyLink = $linkSurvey . '?code=' . $kode;
+                $surveyLinkFull = $linkSurvey . '?code=' . $kode;
 
-                $sendResult = $helper->sendSurveyMessageWithMedia($wa, $kode, $surveyLink);
+                $sendResult = $helper->sendSurveyMessageWithMedia($wa, $kode, $surveyLinkFull);
 
                 if ($sendResult['success']) {
-                    $record->update([
-                        'status_blast_wa' => 'true',
-                        'blast_status' => 'sent',
-                        'blast_sent_at' => now(),
-                        'blast_error' => null,
-                    ]);
+                    $record->update(['status_blast_wa' => 'true']);
                     $successCount++;
                 } else {
-                    $record->update([
-                        'blast_status' => 'failed',
-                        'blast_error' => $sendResult['error'] ?? 'Unknown error'
-                    ]);
                     $failCount++;
                 }
 
-                // Tambahkan jeda antar pesan untuk menghindari rate limit (misal 15 detik)
-                sleep(15); // ⏱️
+                sleep(15);
             }
 
             return redirect()->back()->with('success', "Blasting selesai: {$successCount} berhasil, {$failCount} gagal.");
@@ -89,6 +93,21 @@ class AdminBlastController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses blasting: ' . $e->getMessage());
         }
     }
+
+
+    public function pauseBlast()
+    {
+        Cache::put('blast_stop_flag', true);
+        return redirect()->back()->with('success', 'Blasting WA dihentikan sementara.');
+    }
+
+    // Resume / Lanjutkan Blasting
+    public function resumeBlast()
+    {
+        Cache::forget('blast_stop_flag');
+        return redirect()->back()->with('success', 'Blasting WA dilanjutkan.');
+    }
+
 
 
 

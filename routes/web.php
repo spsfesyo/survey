@@ -89,6 +89,10 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
 Route::middleware(['auth', 'role:1'])->group(function () {
     Route::get('/admin-blast-wa', [AdminBlastController::class, 'index'])->name('admin-blast-wa');
     Route::post('/admin-blast-wa', [AdminBlastController::class, 'BlastingWa'])->name('admin-blast-wa.post');
+    Route::post('/admin-blast-wa/pause', [AdminBlastController::class, 'pauseBlast'])->name('admin-blast.pause');
+    Route::post('/admin-blast-wa/resume', [AdminBlastController::class, 'resumeBlast'])->name('admin-blast.resume');
+
+
     Route::get('/admin-plot-random', [AdminPlotController::class, 'index'])->name('admin-plot-random');
     Route::get('/admin-blast-manual', [AdminBlastManual::class, 'index'])->name('admin-blast-manual');
 });

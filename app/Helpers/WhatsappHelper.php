@@ -15,8 +15,8 @@ class WhatsappHelper
 
     public function __construct()
     {
-        $this->token = "01TRuTo0G8tZoDu8vg19X0mgKVk43jD911E87EX18HXnsARPsVDRJ9A.NWWhGnrJ";
-        $this->url = "https://tegal.wablas.com/api/send-message";
+        $this->token = "SjUrckbTZaM4hCZ49RT3VvWUByg4WvFhaC9qnSaCX4iMZeercjpv0rh.VwnzPQkJ";
+        $this->url = "https://pati.wablas.com/api/send-message";
         $this->maxRetries = 3;
         $this->retryDelay = 2; // seconds
     }
