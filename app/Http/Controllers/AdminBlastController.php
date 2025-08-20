@@ -35,16 +35,16 @@ class AdminBlastController extends Controller
     }
 
 
-
-    public function BlastingWa(Request $request)
+    public function BlastingWa()
     {
         try {
             $batchSize = 100;
             $linkSurvey = "https://survey.superiorprimasukses.co.id/";
 
-            // Cek stop flag
+            // cek stop flag
             if (Cache::get('blast_stop_flag', false)) {
-                return redirect()->back()->with('warning', 'Blasting WA sedang dihentikan sementara.');
+                Log::info("Blasting dihentikan sementara oleh user.");
+                return;
             }
 
             $dataToBlast = MasterOutletSurvey::where('status_blast_wa', 'false')
@@ -55,7 +55,8 @@ class AdminBlastController extends Controller
                 ->get();
 
             if ($dataToBlast->isEmpty()) {
-                return redirect()->back()->with('error', 'Tidak ada data baru untuk dikirim.');
+                Log::info("Tidak ada data baru untuk blasting WA.");
+                return;
             }
 
             $helper = new WhatsappHelper();
@@ -63,9 +64,9 @@ class AdminBlastController extends Controller
             $failCount = 0;
 
             foreach ($dataToBlast as $record) {
-                // Cek stop flag sebelum mengirim setiap pesan
                 if (Cache::get('blast_stop_flag', false)) {
-                    break; // berhenti sementara
+                    Log::warning("Blasting dihentikan saat proses batch sedang berjalan.");
+                    break;
                 }
 
                 $wa = $record->telepone_outlet;
@@ -84,15 +85,69 @@ class AdminBlastController extends Controller
                 sleep(15);
             }
 
-            return redirect()->back()->with('success', "Blasting selesai: {$successCount} berhasil, {$failCount} gagal.");
+            Log::info("Batch blasting selesai: {$successCount} berhasil, {$failCount} gagal.");
         } catch (\Exception $e) {
-            Log::error('Blasting WA Error', [
-                'error' => $e->getMessage()
-            ]);
-
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses blasting: ' . $e->getMessage());
+            Log::error("Blasting WA error: " . $e->getMessage());
         }
     }
+
+    // public function BlastingWa(Request $request)
+    // {
+    //     try {
+    //         $batchSize = 100;
+    //         $linkSurvey = "https://survey.superiorprimasukses.co.id/";
+
+    //         // Cek stop flag
+    //         if (Cache::get('blast_stop_flag', false)) {
+    //             return redirect()->back()->with('warning', 'Blasting WA sedang dihentikan sementara.');
+    //         }
+
+    //         $dataToBlast = MasterOutletSurvey::where('status_blast_wa', 'false')
+    //             ->whereNotNull('telepone_outlet')
+    //             ->whereNotNull('kode_unik')
+    //             ->orderBy('id', 'asc')
+    //             ->limit($batchSize)
+    //             ->get();
+
+    //         if ($dataToBlast->isEmpty()) {
+    //             return redirect()->back()->with('error', 'Tidak ada data baru untuk dikirim.');
+    //         }
+
+    //         $helper = new WhatsappHelper();
+    //         $successCount = 0;
+    //         $failCount = 0;
+
+    //         foreach ($dataToBlast as $record) {
+    //             // Cek stop flag sebelum mengirim setiap pesan
+    //             if (Cache::get('blast_stop_flag', false)) {
+    //                 break; // berhenti sementara
+    //             }
+
+    //             $wa = $record->telepone_outlet;
+    //             $kode = $record->kode_unik;
+    //             $surveyLinkFull = $linkSurvey . '?code=' . $kode;
+
+    //             $sendResult = $helper->sendSurveyMessageWithMedia($wa, $kode, $surveyLinkFull);
+
+    //             if ($sendResult['success']) {
+    //                 $record->update(['status_blast_wa' => 'true']);
+    //                 $successCount++;
+    //             } else {
+    //                 $failCount++;
+    //             }
+
+    //             sleep(15);
+    //         }
+
+    //         return redirect()->back()->with('success', "Blasting selesai: {$successCount} berhasil, {$failCount} gagal.");
+    //     } catch (\Exception $e) {
+    //         Log::error('Blasting WA Error', [
+    //             'error' => $e->getMessage()
+    //         ]);
+
+    //         return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses blasting: ' . $e->getMessage());
+    //     }
+    // }
 
 
     public function pauseBlast()

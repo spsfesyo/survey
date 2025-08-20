@@ -31,7 +31,7 @@ class WhatsappHelper
         $clickableWebsiteLink = $this->formatClickableUrl('https://superiorprimasukses.co.id');
 
         $message = "*Survey Kepuasan Pelanggan*\n\n";
-        $message .= "Terima kasih pelanggan setia bata ringan kami\n\n";
+        $message .= "Terima kasih pelanggan setia bata ringan kami Blesscon\n\n";
         $message .= "Tetap dukung kami dalam memberikan pelayanan terbaik\n";
         $message .= "📝 Isi survey dengan jujur sesuai dengan pengalaman dan saran yang diberikan sangat berarti bagi kami!\n\n";
 

@@ -28,8 +28,8 @@ class BlastWhatsappBatch extends Command
     public function handle()
     {
         $controller = new AdminBlastController();
-        $controller->BlastingWa(new Request());
-
+        // $controller->BlastingWa(new Request());
+        $controller->BlastingWa();
         $this->info('Scheduler: batch blasting executed.');
     }
 }
