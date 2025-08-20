@@ -48,7 +48,7 @@ class AdminBlastController extends Controller
             }
 
             $dataToBlast = MasterOutletSurvey::where('status_blast_wa', 'false')
-                ->whereNotNull('telepon_outlet')
+                ->whereNotNull('telepone_outlet')
                 ->whereNotNull('kode_unik')
                 ->orderBy('id', 'asc')
                 ->limit($batchSize)
