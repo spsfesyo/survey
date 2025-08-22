@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MasterOutletSurvey;
 use Illuminate\Http\Request;
+use App\Models\MasterOutletSurvey;
+use Illuminate\Pagination\Paginator;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\MasterOutletSurveyExport;
 
 class AdminStatusOutlet extends Controller
 {
@@ -14,8 +17,10 @@ class AdminStatusOutlet extends Controller
     {
 
         $status = MasterOutletSurvey::with(['area.provinsi'])
-            ->whereBetween('id', [1, 18])
-            ->orderBy('id', 'asc')->get();
+            // ->whereBetween('id', [1, 18])
+            ->where('status_blast_wa', true)
+            ->orderBy('id', 'asc')
+            ->paginate(10);
 
 
         return view('Admin.admin-status-outlet', compact('status'));
@@ -24,6 +29,12 @@ class AdminStatusOutlet extends Controller
     /**
      * Show the form for creating a new resource.
      */
+
+    public function export()
+    {
+        return Excel::download(new MasterOutletSurveyExport, 'status_outlet.xlsx');
+    }
+
     public function create()
     {
         //

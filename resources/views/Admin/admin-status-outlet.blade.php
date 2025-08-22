@@ -18,8 +18,11 @@
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card">
-                        <div class="card-header">
-                            <h4>Simple Table</h4>
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4>Tabel Status Blast Outlet Berhasil </h4>
+                            <a href="{{ route('status.export') }}" class="btn btn-success">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -36,7 +39,7 @@
 
                                     @foreach ($status as $index => $item)
                                         <tr>
-                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $status->firstItem() + $index }}</td>
                                             <td>{{ $item->nama_outlet }}</td>
                                             <td>{{ $item->telepone_outlet }}</td>
                                             <td>{{ $item->kode_unik }}</td>
@@ -49,24 +52,14 @@
                             </div>
                         </div>
                         <div class="card-footer text-right">
+
                             <nav class="d-inline-block">
-                                <ul class="pagination mb-0">
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#" tabindex="-1"><i
-                                                class="fas fa-chevron-left"></i></a>
-                                    </li>
-                                    <li class="page-item active"><a class="page-link" href="#">1 <span
-                                                class="sr-only">(current)</span></a></li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">2</a>
-                                    </li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>
-                                    </li>
-                                </ul>
+                                {{ $status->links() }}
                             </nav>
                         </div>
+                        {{-- <div class="card-footer text-right">
+                            {{ $status->links() }}
+                        </div> --}}
                     </div>
                 </div>
             </div>
