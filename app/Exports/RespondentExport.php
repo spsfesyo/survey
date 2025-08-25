@@ -26,6 +26,6 @@ class RespondentExport implements FromView
 
         $pertanyaanList = MasterPertanyaan::orderBy('order')->get();
 
-        return view('Admin.exports.excel', compact('respondents', 'pertanyaanList'));
+        return view('Admin.Exports.excel', compact('respondents', 'pertanyaanList'));
     }
 }
