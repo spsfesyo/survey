@@ -19,7 +19,7 @@ class RespondentExport implements FromView
 
     public function view(): View
     {
-        $respondents = MasterRespondent::with(['provinsi', 'kota', 'JenisPertanyaan', 'answers.options'])
+        $respondents = MasterRespondent::with(['provinsi', 'kabupaten', 'JenisPertanyaan', 'answers.options'])
             ->where('jenis_pertanyaan_id', $this->jenisId)
             ->orderBy('created_at', 'asc')
             ->get();
