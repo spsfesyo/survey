@@ -22,7 +22,6 @@ class MasterOutletSurveyExport implements FromCollection, WithHeadings, WithMapp
         return [
             $item->id,
             $item->nama_outlet,
-            $item->sps_internal_name,
             $item->telepone_outlet,
             $item->kode_unik,
             $item->area?->provinsi?->nama_provinsi,
@@ -35,7 +34,6 @@ class MasterOutletSurveyExport implements FromCollection, WithHeadings, WithMapp
         return [
             'No',
             'Nama Outlet',
-            'Nama Outlet Console',
             'Nomor Telp',
             'Kode Unik',
             'Provinsi',

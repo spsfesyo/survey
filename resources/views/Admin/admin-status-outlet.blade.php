@@ -30,7 +30,6 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Nama Outlet</th>
-                                        <th>Nama Outlet Console</th>
                                         <th>Nomor Telp</th>
                                         <th>Kode Unik</th>
                                         <th>Provinsi</th>
@@ -42,7 +41,6 @@
                                         <tr>
                                             <td>{{ $status->firstItem() + $index }}</td>
                                             <td>{{ $item->nama_outlet }}</td>
-                                            <td>{{ $item->sps_internal_name }}</td>
                                             <td>{{ $item->telepone_outlet }}</td>
                                             <td>{{ $item->kode_unik }}</td>
                                             <td>{{ $item->area?->provinsi?->nama_provinsi }}</td>
