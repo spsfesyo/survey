@@ -76,7 +76,8 @@
         <tr>
             <th>No</th>
             <th>Tanggal</th>
-            <th>Outlet</th>
+            <th>Nama Outlet</th>
+            <th>Nama Outlet Console</th>
             @foreach ($pertanyaanList as $pertanyaan)
                 <th>{{ $pertanyaan->pertanyaan }}</th>
             @endforeach
@@ -88,6 +89,7 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ \Carbon\Carbon::parse($respondent->created_at)->format('d-m-Y') }}</td>
                 <td>{{ $respondent->outletSurvey->nama_outlet ?? '-' }}</td>
+                <td>{{ $respondent->outletSurvey->sps_internal_name ?? '-' }}</td>
                 @foreach ($pertanyaanList as $pertanyaan)
                     @php
                         if ($pertanyaan->master_tipe_pertanyaan_id == 5 && $pertanyaan->reference) {

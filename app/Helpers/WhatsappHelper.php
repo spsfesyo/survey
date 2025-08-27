@@ -133,6 +133,25 @@ class WhatsappHelper
     /**
      * Alternative: Kirim pesan dengan logo sebagai media terpisah
      */
+    // public function sendSurveyMessageWithMedia($phoneNumber, $kodeUnik, $surveyLink)
+    // {
+    //     try {
+    //         $formattedPhone = $this->formatPhoneNumber($phoneNumber);
+    //         $logoUrl = url('img/logo.png');
+
+    //         $data = [
+    //             'phone' => $formattedPhone,
+    //             'image' => $logoUrl,
+    //             'caption' => $this->formatSurveyMessageForImage($kodeUnik, $surveyLink)
+    //         ];
+
+    //         return $this->sendMedia($data); // hanya sekali kirim
+    //     } catch (\Exception $e) {
+    //         Log::error('Blast WA Error', ['error' => $e->getMessage()]);
+    //         return ['success' => false, 'error' => $e->getMessage()];
+    //     }
+    // }
+
     public function sendSurveyMessageWithMedia($phoneNumber, $kodeUnik, $surveyLink)
     {
         try {
@@ -422,6 +441,7 @@ class WhatsappHelper
             // Gunakan method dengan media untuk hasil yang lebih baik
             $result = $this->sendSurveyMessageWithMedia(
                 $recipient['telepone_outlet'],
+                // $recipient['no_telp_check'],
                 $recipient['kode_unik'],
                 $surveyLink
             );
