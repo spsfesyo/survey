@@ -34,6 +34,7 @@
                                         <th>Nomor Telp</th>
                                         <th>Kode Unik</th>
                                         <th>Provinsi</th>
+                                        <th>Kabupaten</th>
                                         <th>Area</th>
                                         {{-- <th>Action</th> --}}
                                     </tr>
@@ -45,8 +46,14 @@
                                             <td>{{ $item->sps_internal_name }}</td>
                                             <td>{{ $item->telepone_outlet }}</td>
                                             <td>{{ $item->kode_unik }}</td>
-                                            <td>{{ $item->area?->provinsi?->nama_provinsi }}</td>
-                                            <td>{{ $item->area?->nama_area }}</td>
+                                            {{-- Provinsi via kabupaten --}}
+                                            <td>{{ $item->kabupaten?->provinsi?->nama_provinsi }}</td>
+
+                                            {{-- Nama kabupaten langsung dari master_kabupaten_id --}}
+                                            <td>{{ $item->kabupaten?->nama_kabupaten }}</td>
+
+                                            {{-- Area via kabupaten --}}
+                                            <td>{{ $item->kabupaten?->area?->nama_area }}</td>
                                         </tr>
                                     @endforeach
 

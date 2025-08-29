@@ -82,7 +82,7 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
     Route::get('/download-charts/{type}', [AdminStatistikController::class, 'downloadChartsZip'])->name('download.charts.zip');
     Route::get('/admin/statistik/pie-data', [AdminStatistikController::class, 'downloadPieCharts'])->name('download-pie-charts');
     Route::get('/export-respondent/{jenisId}', [AdminStatistikController::class, 'ExportExcel'])->name('export.respondent');
-    Route::get('/admin-doorprize', [DoorprizeController::class, 'index'])->name('admin-doorprize');
+    //Route::get('/admin-doorprize', [DoorprizeController::class, 'index'])->name('admin-doorprize');
     Route::get('/admin-status-outlet', [AdminStatusOutlet::class, 'index'])->name('admin-status-outlet');
     Route::get('/export-status-outlet', [AdminStatusOutlet::class, 'export'])->name('status.export');
 });

@@ -39,7 +39,7 @@ class MasterOutletSurvey extends Model
     }
     public function historyPemenang()
     {
-        return $this->hasMany(HistoryPemenangSurvey::class, 'mater_outlet_survey_id', 'id'); // ikut nama kolom di migration (typo)
+        return $this->hasMany(HistoryPemenangSurvey::class, 'master_outlet_survey_id', 'id'); // ikut nama kolom di migration (typo)
     }
     public function area()
     {

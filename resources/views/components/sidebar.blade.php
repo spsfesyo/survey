@@ -31,10 +31,10 @@
                     <span>Statistik</span></a>
             </li>
 
-            <li class="{{ Request::is('admin-doorprize') ? 'active' : '' }}">
+            {{-- <li class="{{ Request::is('admin-doorprize') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin-doorprize') }}"><i class="fas fa-gift"></i>
                     <span>Doorprize</span></a>
-            </li>
+            </li> --}}
 
             <li class="{{ Request::is('admin-status-outlet') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin-status-outlet') }}">

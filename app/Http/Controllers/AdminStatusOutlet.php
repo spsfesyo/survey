@@ -16,7 +16,12 @@ class AdminStatusOutlet extends Controller
     public function index()
     {
 
-        $status = MasterOutletSurvey::with(['area.provinsi'])
+        $status = MasterOutletSurvey::with([
+            // 'area.provinsi', 'area.kabupaten.provinsi'
+
+            'kabupaten.provinsi',
+            'kabupaten.area'
+        ])
             // ->whereBetween('id', [1, 18])
             ->where('status_blast_wa', true)
             ->orderBy('id', 'asc')

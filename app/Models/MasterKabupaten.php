@@ -43,5 +43,9 @@ class MasterKabupaten extends Model
     {
         return $this->hasMany(HistoryPemenangSurvey::class, 'master_kabupaten_id', 'id');
     }
+    public function area()
+    {
+        return $this->belongsTo(MasterAreaSurvey::class, 'master_area_id', 'id');
+    }
 
 }
