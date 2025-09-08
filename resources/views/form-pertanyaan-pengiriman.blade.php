@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
     <title>Form Pertanyaan</title>
-     <link rel="icon" type="image/png" href="{{ asset('img/icon-prima-no-bg.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('img/icon-prima-no-bg.png') }}">
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('library/bootstrap/dist/css/bootstrap.min.css') }}">
@@ -50,7 +50,8 @@
                     <div
                         class="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
                         <div class="login-brand">
-                            <img src="{{ asset('img/logo-superior-prima-sukses-no-bg.png') }}" alt="logo" width="300">
+                            <img src="{{ asset('img/logo-superior-prima-sukses-no-bg.png') }}" alt="logo"
+                                width="300">
                         </div>
 
                         <div class="card card-primary">
@@ -93,6 +94,7 @@
                                                                     <input type="radio"
                                                                         name="pertanyaan_{{ $pertanyaan->id }}"
                                                                         value="other_{{ $option->id }}"
+                                                                        {{ $loop->first ? 'required' : '' }}
                                                                         onchange="toggleOtherInput(this, '{{ $pertanyaan->id }}')"
                                                                         {{ $isChecked ? 'checked' : '' }}>
                                                                     Lainnya:
@@ -109,6 +111,7 @@
                                                                     <input type="radio"
                                                                         name="pertanyaan_{{ $pertanyaan->id }}"
                                                                         value="{{ $option->id }}"
+                                                                        {{ $loop->first ? 'required' : '' }}
                                                                         {{ $isChecked ? 'checked' : '' }}>
                                                                     {{ $option->options ?? 'Opsi' }}
                                                                 </label><br>
@@ -178,12 +181,12 @@
                                                     @case(3)
                                                         {{-- Text --}}
                                                         <input type="text" name="pertanyaan_{{ $pertanyaan->id }}"
-                                                            class="form-control" value="{{ $jawabanUtama }}">
+                                                            class="form-control" value="{{ $jawabanUtama }}" required>
                                                     @break
 
                                                     @case(4)
                                                         {{-- Textarea --}}
-                                                        <textarea name="pertanyaan_{{ $pertanyaan->id }}" class="form-control">{{ $jawabanUtama }}</textarea>
+                                                        <textarea name="pertanyaan_{{ $pertanyaan->id }}" class="form-control" required>{{ $jawabanUtama }}</textarea>
                                                     @break
 
                                                     @default
@@ -227,7 +230,7 @@
 
     <!-- JS Libraies -->
 
-    <script>
+    {{-- <script>
         document.querySelector('form').addEventListener('submit', function(e) {
             let isValid = true;
 
@@ -292,13 +295,132 @@
                     }
                 });
 
+                // ✅ Validasi radio wajib
+                document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+                    const name = radio.name;
+                    const radios = document.getElementsByName(name);
+                    if ([...radios].every(r => !r.checked)) {
+                        isValid = false;
+                        messages.push(
+                            `Pertanyaan ${name.replace('pertanyaan_', '')} wajib dipilih salah satu.`
+                        );
+                    }
+                });
+
+                // ✅ Validasi text & textarea wajib
+                document.querySelectorAll('input[type="text"], textarea').forEach(function(field) {
+                    if (field.hasAttribute('required') && field.value.trim() === '') {
+                        isValid = false;
+                        messages.push(
+                            `Pertanyaan ${field.name.replace('pertanyaan_', '')} wajib diisi.`);
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert(messages.join("\n"));
+                }
+            });
+        });
+    </script> --}}
+
+    <script>
+        function toggleOtherInput(input, id) {
+            const textInput = document.getElementById('other_input_' + id);
+            if (!textInput) return;
+
+            if (input.type === 'radio') {
+                // Sembunyikan semua input lainnya dengan nama serupa
+                document.querySelectorAll(`input[id^="other_input_${id}"]`).forEach(el => el.style.display = 'none');
+            }
+
+            textInput.style.display = input.checked ? 'inline-block' : 'none';
+
+            // Kosongkan input jika tidak dicentang
+            if (!input.checked) {
+                textInput.value = '';
+            }
+        }
+    </script>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            let isValid = true;
+
+            document.querySelectorAll('input[name="required_checkbox[]"]').forEach(function(hiddenInput) {
+                let id = hiddenInput.value;
+                let checkboxes = document.querySelectorAll('.checkbox-group-' + id);
+                let checked = Array.from(checkboxes).some(cb => cb.checked);
+
+                if (!checked) {
+                    isValid = false;
+                    alert('Mohon pilih minimal satu opsi untuk pertanyaan wajib.');
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+    </script>
+
+    <!-- Validasi Batas Pilihan -->
+    <script>
+        $(document).ready(function() {
+            $('.checkbox-wrapper').each(function() {
+                const $wrapper = $(this);
+                const batas = parseInt($wrapper.data('batas-pilihan'));
+                const questionId = $wrapper.data('question-id');
+                const $checkboxes = $wrapper.find('.checkbox-group-' + questionId);
+
+                if (!batas) return;
+
+                function enforceLimit() {
+                    const checkedCount = $checkboxes.filter(':checked').length;
+
+                    if (checkedCount >= batas) {
+                        // Disable checkbox yang belum dicentang
+                        $checkboxes.each(function() {
+                            if (!$(this).is(':checked')) {
+                                $(this).prop('disabled', true);
+                            }
+                        });
+                    } else {
+                        // Enable semua kalau belum sampai batas
+                        $checkboxes.prop('disabled', false);
+                    }
+                }
+
+                // Jalankan saat load & setiap kali ada perubahan
+                enforceLimit();
+                $checkboxes.on('change', enforceLimit);
+            });
+
+            // Validasi saat form disubmit
+            $('form').on('submit', function(e) {
+                let isValid = true;
+
+                $('input[name="required_checkbox[]"]').each(function() {
+                    const id = $(this).val();
+                    const $checkboxes = $('.checkbox-group-' + id);
+                    const batas = parseInt($('.checkbox-wrapper[data-question-id="' + id + '"]')
+                        .data('batas-pilihan'));
+                    const checkedCount = $checkboxes.filter(':checked').length;
+
+                    if (checkedCount < batas) {
+                        isValid = false;
+                        alert(
+                            `Pertanyaan dengan pilihan checkbox membutuhkan minimal ${batas} pilihan. Anda baru memilih ${checkedCount}.`
+                        );
+                    }
+                });
+
                 if (!isValid) {
                     e.preventDefault();
                 }
             });
         });
     </script>
-
 
 
     <!-- Page Specific JS File -->

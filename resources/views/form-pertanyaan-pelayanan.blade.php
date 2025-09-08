@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
     <title>Form Pertanyaan</title>
-     <link rel="icon" type="image/png" href="{{ asset('img/icon-prima-no-bg.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('img/icon-prima-no-bg.png') }}">
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('library/bootstrap/dist/css/bootstrap.min.css') }}">
@@ -52,7 +52,8 @@
                     <div
                         class="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
                         <div class="login-brand">
-                            <img src="{{ asset('img/logo-superior-prima-sukses-no-bg.png') }}" alt="logo" width="300">
+                            <img src="{{ asset('img/logo-superior-prima-sukses-no-bg.png') }}" alt="logo"
+                                width="300">
                         </div>
 
                         <div class="card card-primary">
@@ -321,6 +322,14 @@
                     }
                 });
 
+                // 🔹 Validasi foto wajib ada
+
+                const fotoBase64 = document.getElementById('foto_base64').value.trim();
+                if (!fotoBase64) {
+                    isValid = false;
+                    messages.push("Anda wajib mengambil foto terlebih dahulu sebelum submit.");
+                }
+                
                 if (!isValid) {
                     e.preventDefault();
                     Swal.fire({
@@ -395,7 +404,7 @@
         });
     </script>
 
-{{-- 
+    {{--
     @if (session('phone_duplicate'))
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
@@ -412,7 +421,7 @@
 
 
 
-    {{-- <script>
+{{-- <script>
         document.getElementById('startCamera').addEventListener('click', async () => {
             const video = document.getElementById('video');
 
@@ -461,8 +470,8 @@
 
 
 
-        <!-- Validasi & Logika Form -->
-    {{-- <!-- General JS Scripts -->
+<!-- Validasi & Logika Form -->
+{{-- <!-- General JS Scripts -->
     <script src="{{ asset('library/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ asset('library/popper.js/dist/umd/popper.js') }}"></script>
     <script src="{{ asset('library/tooltip.js/dist/umd/tooltip.js') }}"></script>
@@ -472,8 +481,8 @@
     <script src="{{ asset('js/stisla.js') }}"></script> --}}
 
 
-         {{-- Ambil Foto Pelayanan --}}
-                                    {{-- <div class="form-group">
+{{-- Ambil Foto Pelayanan --}}
+{{-- <div class="form-group">
                                         <label><strong>Mohon Sertakan Foto (selfie pengisi survey/foto plang toko or
                                                 nota toko yg keliatan nama toko)</strong></label><br>
                                         <video id="video" autoplay playsinline
