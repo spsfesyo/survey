@@ -50,9 +50,9 @@
                     </a>
                 </li>
 
-                <li class="{{ Request::is('admin-blast-manual') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('admin-blast-manual') }}">
-                        <i class="fas fa-table"></i> <span>Blasting Manual</span>
+                <li class="{{ Request::is('admin-list-pertanyaan') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('admin-list-pertanyaan') }}">
+                        <i class="fas fa-file-pdf"></i> <span>List Pertanyaan</span>
                     </a>
                 </li>
 
@@ -61,6 +61,13 @@
                         <i class="fas fa-users-cog"></i> <span>Blasting Wa</span>
                     </a>
                 </li>
+
+                {{-- <li class="{{ Request::is('export-survey-pdf') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('export-survey-pdf') }}">
+                        <i class="fas fa-file-pdf"></i> <span>Export Survey PDF</span>
+                    </a>
+                </li> --}}
+
             @endif
 
 

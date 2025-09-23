@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\testController;
 use App\Http\Controllers\AdminBlastManual;
 use App\Http\Controllers\AdminStatusOutlet;
+use App\Http\Controllers\AdminPdfController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminPlotController;
 use App\Http\Controllers\DoorprizeController;
@@ -92,10 +93,12 @@ Route::middleware(['auth', 'role:1'])->group(function () {
     Route::post('/admin-blast-wa', [AdminBlastController::class, 'BlastingWa'])->name('admin-blast-wa.post');
     Route::post('/admin-blast-wa/pause', [AdminBlastController::class, 'pauseBlast'])->name('admin-blast.pause');
     Route::post('/admin-blast-wa/resume', [AdminBlastController::class, 'resumeBlast'])->name('admin-blast.resume');
+    Route::get('/admin-list-pertanyaan',[AdminPdfController::class, 'index'])->name('admin-list-pertanyaan');
+    Route::get('/export-survey', [AdminPdfController::class, 'exportSurveyPdf'])->name('export-survey-pdf');
 
 
     Route::get('/admin-plot-random', [AdminPlotController::class, 'index'])->name('admin-plot-random');
-    Route::get('/admin-blast-manual', [AdminBlastManual::class, 'index'])->name('admin-blast-manual');
+   
 });
 
 // Route::middleware('auth:survey')->get('/dashboard', function () {
