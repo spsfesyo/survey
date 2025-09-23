@@ -42,6 +42,13 @@
                 </a>
             </li>
 
+            <li class="{{ Request::is('admin-list-pertanyaan') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin-list-pertanyaan') }}">
+                    <i class="fas fa-file-pdf"></i> <span>List Pertanyaan</span>
+                </a>
+            </li>
+
+
             {{-- Menu khusus untuk Role ID 1 (Admin) --}}
             @if (auth()->user()->role_id == 1)
                 <li class="{{ Request::is('admin-plot-random') ? 'active' : '' }}">
@@ -67,7 +74,6 @@
                         <i class="fas fa-file-pdf"></i> <span>Export Survey PDF</span>
                     </a>
                 </li> --}}
-
             @endif
 
 

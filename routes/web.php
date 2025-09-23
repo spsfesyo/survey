@@ -86,6 +86,8 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
     //Route::get('/admin-doorprize', [DoorprizeController::class, 'index'])->name('admin-doorprize');
     Route::get('/admin-status-outlet', [AdminStatusOutlet::class, 'index'])->name('admin-status-outlet');
     Route::get('/export-status-outlet', [AdminStatusOutlet::class, 'export'])->name('status.export');
+    Route::get('/admin-list-pertanyaan', [AdminPdfController::class, 'index'])->name('admin-list-pertanyaan');
+    Route::get('/export-survey', [AdminPdfController::class, 'exportSurveyPdf'])->name('export-survey-pdf');
 });
 
 Route::middleware(['auth', 'role:1'])->group(function () {
@@ -93,12 +95,11 @@ Route::middleware(['auth', 'role:1'])->group(function () {
     Route::post('/admin-blast-wa', [AdminBlastController::class, 'BlastingWa'])->name('admin-blast-wa.post');
     Route::post('/admin-blast-wa/pause', [AdminBlastController::class, 'pauseBlast'])->name('admin-blast.pause');
     Route::post('/admin-blast-wa/resume', [AdminBlastController::class, 'resumeBlast'])->name('admin-blast.resume');
-    Route::get('/admin-list-pertanyaan',[AdminPdfController::class, 'index'])->name('admin-list-pertanyaan');
-    Route::get('/export-survey', [AdminPdfController::class, 'exportSurveyPdf'])->name('export-survey-pdf');
+    // Route::get('/admin-list-pertanyaan', [AdminPdfController::class, 'index'])->name('admin-list-pertanyaan');
+    // Route::get('/export-survey', [AdminPdfController::class, 'exportSurveyPdf'])->name('export-survey-pdf');
 
 
     Route::get('/admin-plot-random', [AdminPlotController::class, 'index'])->name('admin-plot-random');
-   
 });
 
 // Route::middleware('auth:survey')->get('/dashboard', function () {
