@@ -51,20 +51,9 @@
                     <td>{{ $jawaban }}</td>
                 @endforeach
 
-                <td>
-                <td>
-                    @php
-                        $fotoPath = storage_path('app/public/foto-respondent/' . $respondent->foto_selfie);
-                    @endphp
 
-                    @if ($respondent->foto_selfie && file_exists($fotoPath))
-                        {{-- Gunakan public_path agar Excel bisa baca file lokal --}}
-                        <img src="{{ $fotoPath }}" width="70" height="70" alt="Foto">
-                    @else
-                        -
-                    @endif
-                </td>
-                </td>
+                {{-- kolom foto, dikosongkan saja karena gambar diatur via Drawing() --}}
+                <td></td>
 
             </tr>
         @endforeach

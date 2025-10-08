@@ -81,6 +81,7 @@
             @foreach ($pertanyaanList as $pertanyaan)
                 <th>{{ $pertanyaan->pertanyaan }}</th>
             @endforeach
+            <th>Foto Respondent</th>
         </tr>
     </thead>
     <tbody>
@@ -121,6 +122,8 @@
                     @endphp
                     <td>{{ $jawaban }}</td>
                 @endforeach
+                {{-- kosong karena sudah diatur di Drawing() --}}
+                <td></td>
             </tr>
         @endforeach
     </tbody>

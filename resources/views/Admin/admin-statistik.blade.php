@@ -124,14 +124,13 @@
                                                     @endforeach
                                                     <td>
                                                         @if ($respondent->foto_selfie)
-                                                            <img src="{{ asset('storage/' . $respondent->foto_selfie) }}"
+                                                            <img src="{{ asset('storage/foto-respondent/' . $respondent->foto_selfie) }}"
                                                                 alt="Foto Respondent" width="100"
                                                                 style="border-radius: 8px;">
                                                         @else
                                                             -
                                                         @endif
                                                     </td>
-
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -235,7 +234,7 @@
 
                                                     <td>
                                                         @if ($respondent->foto_selfie)
-                                                            <img src="{{ asset('storage/' . $respondent->foto_selfie) }}"
+                                                            <img src="{{ asset('storage/foto-respondent/' . $respondent->foto_selfie) }}"
                                                                 alt="Foto Respondent" width="100"
                                                                 style="border-radius: 8px;">
                                                         @else

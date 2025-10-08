@@ -35,20 +35,36 @@ class RespondentExport implements FromView, WithDrawings
     {
         $drawings = [];
 
+        // Ambil semua respondent sesuai jenis pertanyaan
         $respondents = MasterRespondent::where('jenis_pertanyaan_id', $this->jenisId)
             ->orderBy('created_at', 'asc')
             ->get();
 
+        // Loop untuk setiap respondent
         foreach ($respondents as $index => $respondent) {
-            $path = storage_path('app/public/foto-respondent/' . $respondent->foto_selfie);
-            if ($respondent->foto_selfie && file_exists($path)) {
-                $drawing = new Drawing();
-                $drawing->setName('Foto Respondent');
-                $drawing->setDescription('Foto Selfie');
-                $drawing->setPath($path);
-                $drawing->setHeight(80);
-                $drawing->setCoordinates('E' . ($index + 2)); // kolom E sesuai urutan di tabel
-                $drawings[] = $drawing;
+            if ($respondent->foto_selfie) {
+                $path = public_path('storage/foto-respondent/' . $respondent->foto_selfie);
+
+                if (file_exists($path)) {
+                    $drawing = new Drawing();
+                    $drawing->setName('Foto Respondent');
+                    $drawing->setDescription('Foto Selfie');
+                    $drawing->setPath($path);
+
+                    // ✅ Atur ukuran gambar seragam
+                    $drawing->setWidth(70);   // lebar gambar
+                    $drawing->setHeight(70);  // tinggi gambar
+
+                    // ✅ Posisi gambar di kolom G, baris menyesuaikan data
+                    //   (ubah 'G' jika kolom kamu berbeda)
+                    $drawing->setCoordinates('G' . ($index + 2));
+
+                    // ✅ Atur offset agar posisi gambar tidak terlalu mepet
+                    $drawing->setOffsetX(5);
+                    $drawing->setOffsetY(5);
+
+                    $drawings[] = $drawing;
+                }
             }
         }
 
