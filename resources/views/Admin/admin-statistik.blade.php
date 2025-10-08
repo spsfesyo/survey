@@ -125,8 +125,8 @@
                                                     <td>
                                                         @if ($respondent->foto_selfie)
                                                             <img src="{{ asset('storage/foto-respondent/' . $respondent->foto_selfie) }}"
-                                                                alt="Foto Respondent" width="100"
-                                                                style="border-radius: 8px;">
+                                                                alt="Foto Respondent"
+                                                                style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
                                                         @else
                                                             -
                                                         @endif
