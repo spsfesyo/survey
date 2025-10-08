@@ -53,7 +53,14 @@
 
 
                 {{-- kolom foto, dikosongkan saja karena gambar diatur via Drawing() --}}
-                <td></td>
+                <td>
+                    @if ($respondent->foto_selfie_url !== '-')
+                        <a href="{{ $respondent->foto_selfie_url }}"
+                            target="_blank">{{ $respondent->foto_selfie_url }}</a>
+                    @else
+                        -
+                    @endif
+                </td>
 
             </tr>
         @endforeach
