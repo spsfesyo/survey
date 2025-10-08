@@ -63,6 +63,7 @@
                                                 @foreach ($pertanyaanList as $pertanyaan)
                                                     <th>{{ $pertanyaan->pertanyaan }}</th>
                                                 @endforeach
+                                                <th>Foto Respondent</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -121,6 +122,16 @@
                                                         @endphp
                                                         <td>{{ $jawaban }}</td>
                                                     @endforeach
+                                                    <td>
+                                                        @if ($respondent->foto_selfie)
+                                                            <img src="{{ asset('storage/' . $respondent->foto_selfie) }}"
+                                                                alt="Foto Respondent" width="100"
+                                                                style="border-radius: 8px;">
+                                                        @else
+                                                            -
+                                                        @endif
+                                                    </td>
+
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -164,6 +175,7 @@
                                                 @foreach ($pertanyaanList as $pertanyaan)
                                                     <th>{{ $pertanyaan->pertanyaan }}</th>
                                                 @endforeach
+                                                <th>Foto Respondent</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -220,6 +232,17 @@
                                                         @endphp
                                                         <td>{{ $jawaban }}</td>
                                                     @endforeach
+
+                                                    <td>
+                                                        @if ($respondent->foto_selfie)
+                                                            <img src="{{ asset('storage/' . $respondent->foto_selfie) }}"
+                                                                alt="Foto Respondent" width="100"
+                                                                style="border-radius: 8px;">
+                                                        @else
+                                                            -
+                                                        @endif
+                                                    </td>
+
                                                 </tr>
                                             @endforeach
                                         </tbody>
