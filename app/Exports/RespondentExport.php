@@ -32,7 +32,7 @@ class RespondentExport implements FromView
         foreach ($respondents as $respondent) {
             if ($respondent->foto_selfie) {
                 // Buat URL publik untuk foto respondent
-                $respondent->foto_selfie_url = asset('storage/foto-respondent/' . $respondent->foto_selfie);
+                $respondent->foto_selfie_url = asset( $respondent->foto_selfie);
             } else {
                 $respondent->foto_selfie_url = '-';
             }
