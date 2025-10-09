@@ -234,7 +234,7 @@
 
                                                     <td>
                                                         @if ($respondent->foto_selfie)
-                                                            <img src="{{ asset( $respondent->foto_selfie) }}"
+                                                            <img src="{{ asset($respondent->foto_selfie) }}"
                                                                 alt="Foto Respondent" width="100"
                                                                 style="border-radius: 8px;">
                                                         @else
@@ -268,10 +268,12 @@
                                     <i class="fas fa-download"></i> Download Semua Diagram Lingkaran (.zip)
                                 </button>
                             </div>
+
                             <div class="card-body">
-                                <div class="row">
-                                    @foreach ($chartPaginated as $chart)
-                                        <div class="col-lg-3 col-md-6 mb-4">
+                                {{-- Wrapper untuk semua chart --}}
+                                <div id="pieChartContainer">
+                                    @foreach ($chartPaginated as $index => $chart)
+                                        <div class="chart-page" style="display: {{ $loop->first ? 'block' : 'none' }};">
                                             <div class="card">
                                                 <div class="card-header">
                                                     <h6 class="mb-0">{{ $chart['label'] }}</h6>
@@ -279,6 +281,7 @@
                                                 <div class="card-body">
                                                     <x-charts.pie :chartId="$chart['chartId']" :labels="$chart['labels']" :values="$chart['values']"
                                                         label="{{ $chart['label'] }}" />
+
                                                     @if (count($chart['labels']) === 1 && $chart['labels'][0] === 'Tidak ada data')
                                                         <p class="text-muted mt-2">Belum ada data jawaban untuk pertanyaan
                                                             ini.</p>
@@ -303,32 +306,33 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">Diagram Batang Data Respondent </h4>
+                                <h4 class="mb-0">Diagram Batang Data Respondent</h4>
                                 <button type="button" class="btn btn-success" onclick="downloadAllCharts('bar')">
                                     <i class="fas fa-download"></i> Download Semua Diagram Batang (.zip)
                                 </button>
                             </div>
+
                             <div class="card-body">
                                 <div class="row">
                                     @foreach ($barChartPaginated as $barChart)
-                                        <div class="col-lg-3 col-md-6 mb-4">
-                                            <div class="card">
+                                        <div class="col-md-12 mb-4">
+                                            <div class="card shadow-sm">
                                                 <div class="card-header">
                                                     <h6 class="mb-0">{{ $barChart['label'] }}</h6>
                                                 </div>
-                                                <script>
-                                                    console.log('Data Barchart untuk {{ $barChart['label'] }}:',
-                                                        JSON.parse('@json($barChart)'));
-                                                </script>
+
                                                 <div class="card-body">
                                                     @if ($barChart['isEmpty'])
-                                                        <p class="text-muted">Tidak ada data untuk ditampilkan</p>
+                                                        <p class="text-muted text-center mb-0">Tidak ada data untuk
+                                                            ditampilkan</p>
                                                     @else
                                                         <x-charts.bar :chartId="'bar-chart-' . $barChart['questionId']" :labels="$barChart['labels']" :values="$barChart['values']"
                                                             :labelName="$barChart['label']" />
                                                     @endif
-                                                    <div class="mt-2 text-center small">
-                                                        Total Responden: {{ $barChart['totalResponses'] ?? 0 }}
+
+                                                    <div class="mt-3 text-center small">
+                                                        <span class="text-secondary">Total Responden:
+                                                            {{ $barChart['totalResponses'] ?? 0 }}</span>
                                                     </div>
                                                 </div>
                                             </div>

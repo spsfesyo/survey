@@ -189,7 +189,7 @@ class AdminStatistikController extends Controller
         }
 
         // Pagination untuk PIE chart - menggunakan pageName 'chart'
-        $perPage = 4;
+        $perPage = 1;
         $currentChartPage = request()->get('chart', 1);
         $chartDataCollection = collect($chartData);
 
@@ -323,7 +323,7 @@ class AdminStatistikController extends Controller
 
 
         // Pagination untuk BAR chart - menggunakan pageName 'barchart'
-        $perPageBarChart = 4;
+        $perPageBarChart = 1;
         $currentBarChartPage = request()->get('barchart', 1);
         $barChartDataCollection = collect($barChartData);
 
