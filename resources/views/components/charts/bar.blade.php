@@ -1,4 +1,4 @@
-{{--  --}}
+
 
 @props(['chartId', 'labels', 'values', 'labelName'])
 
