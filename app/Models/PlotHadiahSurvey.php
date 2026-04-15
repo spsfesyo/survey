@@ -14,15 +14,18 @@ class PlotHadiahSurvey extends Model
         'periode_survey_id',
         'provinsi_id',
         'master_kabupaten_id',
+        'master_area_id',
         'master_outlet_survey_id',
         'hadiah_id',
-        'status_plot',
+        'is_winning',
+        'tanggal_menang',
         'status_respondent_assigned',
+        'respondent_id',
     ];
 
-    public function periodeSurvey()
+    public function periode()
     {
-        return $this->belongsTo(PeriodeSurvey::class, 'periode_survey_id', 'id');
+        return $this->belongsTo(MasterPeriode::class, 'periode_survey_id', 'id');
     }
     public function provinsi()
     {
@@ -41,8 +44,12 @@ class PlotHadiahSurvey extends Model
     {
         return $this->belongsTo(MasterHadiah::class, 'hadiah_id', 'id');
     }
-    // public function respondents()
-    // {
-    //     return $this->hasMany(MasterRespondent::class, 'plot_hadiah_survey_id', 'id');
-    // }
+    public function respondents()
+    {
+        return $this->hasMany(MasterRespondent::class, 'respondent_id', 'id');
+    }
+    public function area()
+    {
+        return $this->belongsTo(MasterAreaSurvey::class, 'master_area_id', 'id');
+    }
 }

@@ -21,9 +21,11 @@ class MasterRespondent extends Model
         'foto_selfie',
         'provinsi_id',
         'master_kabupaten_id',
+        'area_id',
         'jenis_pertanyaan_id',
         'hadiah_id',
         'periode_id', // foreign key to PeriodeSurvey
+        'is_gimmick',
         'status_hadiah'
 
     ];
@@ -37,6 +39,11 @@ class MasterRespondent extends Model
     public function kabupaten()
     {
         return $this->belongsTo(MasterKabupaten::class, 'master_kabupaten_id');
+    }
+
+    public function area()
+    {
+        return $this->belongsTo(MasterAreaSurvey::class, 'area_id');
     }
 
     public function jenisPertanyaan()
@@ -61,8 +68,8 @@ class MasterRespondent extends Model
     {
         return $this->belongsTo(MasterHadiah::class, 'hadiah_id');
     }
-    public function periodeSurvey()
+    public function periode()
     {
-        return $this->belongsTo(PeriodeSurvey::class, 'periode_survey_id');
+        return $this->belongsTo(MasterPeriode::class, 'periode_id', 'id');
     }
 }

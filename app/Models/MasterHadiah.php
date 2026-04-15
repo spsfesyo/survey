@@ -10,10 +10,12 @@ class MasterHadiah extends Model
     use HasFactory;
     protected $table = 'master_hadiah_survey';
     protected $fillable = [
+
         'kode_hadiah',
         'nama_hadiah',
         'jumlah_hadiah',
         'status',
+        'periode_survey_id'
 
     ];
 
@@ -30,9 +32,13 @@ class MasterHadiah extends Model
     {
         return $this->hasMany(PlotHadiahSurvey::class, 'hadiah_id', 'id');
     }
-    public function historyPemenang()
+    // public function historyPemenang()
+    // {
+    //     return $this->hasMany(HistoryPemenangSurvey::class, 'hadiah_id', 'id');
+    // }
+    public function periode()
     {
-        return $this->hasMany(HistoryPemenangSurvey::class, 'hadiah_id', 'id');
+        return $this->belongsTo(MasterPeriode::class, 'periode_survey_id');
     }
 
 }

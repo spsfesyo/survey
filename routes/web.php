@@ -1,17 +1,19 @@
 <?php
 
+use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminBlastController;
+use App\Http\Controllers\AdminBlastManual;
+use App\Http\Controllers\AdminKonfigController;
+use App\Http\Controllers\AdminPdfController;
+use App\Http\Controllers\AdminPlotController;
+use App\Http\Controllers\AdminReportController;
+use App\Http\Controllers\AdminStatistikController;
+use App\Http\Controllers\AdminStatusOutlet;
+use App\Http\Controllers\DoorprizeController;
+use App\Http\Controllers\RespondentController;
+use App\Http\Controllers\testController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\testController;
-use App\Http\Controllers\AdminBlastManual;
-use App\Http\Controllers\AdminStatusOutlet;
-use App\Http\Controllers\AdminPdfController;
-use App\Http\Controllers\AdminAuthController;
-use App\Http\Controllers\AdminPlotController;
-use App\Http\Controllers\DoorprizeController;
-use App\Http\Controllers\AdminBlastController;
-use App\Http\Controllers\RespondentController;
-use App\Http\Controllers\AdminStatistikController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,14 +30,15 @@ use App\Http\Controllers\AdminStatistikController;
 //     return view('home');
 // });
 
-Route::get('/', [RespondentController::class, 'index'])->name('home');
+// index awal
+Route::get('/', [RespondentController::class, 'getFormUtama'])->name('home');
 
-Route::post('/submit-kode-unik', [RespondentController::class, 'create'])->name('submit-kode-unik');
+// Route::post('/submit-kode-unik', [RespondentController::class, 'create'])->name('submit-kode-unik');
 
 Route::get('/form-utama', [RespondentController::class, 'getFormUtama'])->name('form-utama');
 Route::post('/form-utama', [RespondentController::class, 'answerFormUtama'])->name('post-form-utama');
 Route::get('/get-kabupaten/{provinsi_id}', [RespondentController::class, 'getKabupatenByProvinsi'])->name('get-kabupaten');
-Route::get('/check-phone-duplicate', [RespondentController::class, 'checkDuplicatePhone'])->name('check-duplicate-phone');
+// Route::get('/check-phone-duplicate', [RespondentController::class, 'checkDuplicatePhone'])->name('check-duplicate-phone');
 
 
 
@@ -55,7 +58,14 @@ Route::post('/form-pertanyaan-harga', [RespondentController::class, 'answerFormH
 Route::get('/form-pertanyaan-pengiriman', [RespondentController::class, 'getFormPengiriman'])->name('form-pertanyaan-pengiriman');
 Route::post('/form-pertanyaan-pengiriman', [RespondentController::class, 'answerFormPengiriman'])->name('post-form-pertanyaan-pengiriman');
 Route::get('/form-pertanyaan-pelayanan', [RespondentController::class, 'getFormPelayanan'])->name('form-pertanyaan-pelayanan');
-Route::post('/form-pertanyaan-pelayanan', [RespondentController::class, 'submitFinalAnswer'])->name('post-form-pertanyaan-pelayanan');
+Route::post('/form-pertanyaan-pelayanan', [RespondentController::class, 'answerFormPelayanan'])->name('post-form-pertanyaan-pelayanan');
+Route::get('/form-pertanyaan-gimmick', [RespondentController::class, 'getFormGimmick'])->name('form-pertanyaan-gimmick');
+Route::post('/form-pertanyaan-gimmick', [RespondentController::class, 'answerFormGimmick'])->name('post-form-pertanyaan-gimmick');
+
+Route::post('/submit-final', [RespondentController::class, 'submitFinalAnswer'])->name('submit-final');
+
+
+
 
 
 
@@ -88,6 +98,38 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
     Route::get('/export-status-outlet', [AdminStatusOutlet::class, 'export'])->name('status.export');
     Route::get('/admin-list-pertanyaan', [AdminPdfController::class, 'index'])->name('admin-list-pertanyaan');
     Route::get('/export-survey', [AdminPdfController::class, 'exportSurveyPdf'])->name('export-survey-pdf');
+
+    // Konfigurasi Survey
+    Route::get('/konfig-survey', [AdminKonfigController::class, 'index'])->name('konfig-survey');
+    //konfig periode
+    Route::post('/periode/store', [AdminKonfigController::class, 'PeriodeCreate'])->name('periode-create');
+    Route::put('/periode/update', [AdminKonfigController::class, 'PeriodeUpdate'])->name('periode-update');
+    //konfig hadiah
+    Route::post('/hadiah/store', [AdminKonfigController::class, 'HadiahCreate'])->name('hadiah-create');
+    Route::put('/hadiah/update', [AdminKonfigController::class, 'HadiahUpdate'])->name('hadiah-update');
+    //konfig plot hadiah
+    Route::post('plot-hadiah/store', [AdminKonfigController::class, 'PlotCreate'])->name('plot-store');
+    Route::put('/plot/{id}/update', [AdminKonfigController::class, 'updatePlot'])
+        ->name('plot-update');
+    Route::delete('/plot/{id}/delete', [AdminKonfigController::class, 'deletePlot'])
+        ->name('plot.delete');
+
+
+    // status otulet
+    Route::post('/enable-kode-unik', [AdminStatusOutlet::class, 'EnableAllStatusCode'])->name('enable-kode-unik');
+    Route::post('/disable-kode-unik', [AdminStatusOutlet::class, 'DisableAllStatusCode'])->name('disable-kode-unik');
+    Route::post('/outlet-status/update', [AdminStatusOutlet::class, 'updateStatusCode'])->name('outlet-status-kode-update');
+    Route::post('/outlet-status/regenerate', [AdminStatusOutlet::class, 'RegenerateUnikCode'])->name('outlet-regenerate-unik-code');
+
+
+    //report
+
+    //untuk menampilkan index
+    Route::get('/admin-report', [AdminReportController::class, 'index'])->name('view-report');
+    //untuk get dan submit date picker periode
+    Route::get('/admin/report/export/{id}', [AdminReportController::class, 'export'])->name('report.export');
+    //untuk export excelnya
+    Route::get('/admin/report/export/{id}', [AdminReportController::class, 'export'])->name('admin-report-export');
 });
 
 Route::middleware(['auth', 'role:1'])->group(function () {

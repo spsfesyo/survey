@@ -68,7 +68,7 @@ class AdminStatistikController extends Controller
             ->where('jenis_pertanyaan_id', 2)
             ->orderBy('created_at', 'desc') // ⬅️ tambahkan ini
             ->paginate(5, ['*'], 'tabel2');
-            // dd($respondentsJenis2);
+        // dd($respondentsJenis2);
 
         // Ambil semua data untuk chart (tidak perlu pagination di sini)
         $respondentsAll = MasterRespondent::with([
@@ -82,6 +82,7 @@ class AdminStatistikController extends Controller
         $pertanyaanList = MasterPertanyaan::orderBy('order')->get();
 
         $chartData = [];
+
 
         foreach ($pertanyaanList as $pertanyaan) {
             $answers = collect();
@@ -343,12 +344,6 @@ class AdminStatistikController extends Controller
             Log::info("BarChart {$index}: Q{$barChart['questionId']} - {$barChart['label']} - Has Data: " . ($barChart['hasData'] ? 'Yes' : 'No') . " - Total: " . array_sum($barChart['values']) . " - Labels: " . implode(', ', $barChart['labels']));
         }
 
-        // dd([
-        //     'respondents' => $respondentsPaginated,
-        //     'pertanyaanList' => $pertanyaanList,
-        //     'chartPaginated' => $paginatedChart,
-        //     'barChartPaginated' => $paginatedBarChart
-        // ]);
 
         return view('Admin.admin-statistik', [
             'respondents' => $respondentsPaginated,
@@ -363,38 +358,11 @@ class AdminStatistikController extends Controller
     }
 
 
+    //  pie chart dan barchart versi lama
+    //  pie chart dan barchart versi lama
 
-    // public function showTableKuisioner()
-    // {
 
-    //     $pertanyaanListKuisioner = MasterPertanyaan::orderBy('order')->get();
 
-    //     // Ambil respondent dengan jenis_pertanyaan_id = 1 (misal Blesscon)
-    //     $respondentsJenis1 = MasterRespondent::with([
-    //         'provinsi',
-    //         'kota',
-    //         'JenisPertanyaan',
-    //         'answers.options'
-    //     ])
-    //         ->where('jenis_pertanyaan_id', 1)
-    //         ->paginate(5, ['*'], 'tabel1');
-
-    //     // Ambil respondent dengan jenis_pertanyaan_id = 2 (misal Superior)
-    //     $respondentsJenis2 = MasterRespondent::with([
-    //         'provinsi',
-    //         'kota',
-    //         'JenisPertanyaan',
-    //         'answers.options'
-    //     ])
-    //         ->where('jenis_pertanyaan_id', 2)
-    //         ->paginate(5, ['*'], 'tabel2');
-
-    //     return view('Admin.admin-statistik', compact(
-    //         'pertanyaanListKuisioner',
-    //         'respondentsJenis1',
-    //         'respondentsJenis2'
-    //     ));
-    // }
 
     /**
      * Show the form for creating a new resource.
@@ -405,79 +373,9 @@ class AdminStatistikController extends Controller
         return Excel::download(new RespondentExport($jenisId), $namaFile);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    // public function downloadPieCharts(Request $request)
-    // {
-    //     $charts = $request->input('charts', []);
-    //     if (empty($charts)) {
-    //         return response()->json(['error' => 'No chart data provided'], 400);
-    //     }
 
-    //     $publicPath = storage_path('app/public');
-    //     if (!is_dir($publicPath)) {
-    //         mkdir($publicPath, 0755, true);
-    //     }
 
-    //     $tempFiles = [];
-    //     foreach ($charts as $index => $chart) {
-    //         if (empty($chart['dataUrl'])) {
-    //             Log::error("Chart $index dataUrl is empty");
-    //             continue;
-    //         }
-
-    //         $filename = 'chart_' . $index . '_' . uniqid() . '.jpg';
-    //         $path = $publicPath . '/' . $filename;
-
-    //         $data = $chart['dataUrl'];
-    //         if (strpos($data, 'base64,') !== false) {
-    //             list(, $data) = explode('base64,', $data);
-    //         }
-
-    //         $binaryData = base64_decode($data);
-    //         if ($binaryData === false) {
-    //             Log::error("Chart $index failed base64 decode");
-    //             continue;
-    //         }
-
-    //         file_put_contents($path, $binaryData);
-    //         if (filesize($path) === 0) {
-    //             Log::error("Chart $index file size 0: $path");
-    //             continue;
-    //         }
-
-    //         $tempFiles[] = $path;
-    //     }
-
-    //     if (empty($tempFiles)) {
-    //         return response()->json(['error' => 'No valid chart images created'], 500);
-    //     }
-
-    //     $zipName = 'pie_charts_' . now()->format('Ymd_His') . '.zip';
-    //     $zipPath = $publicPath . '/' . $zipName;
-
-    //     $zip = new ZipArchive;
-    //     if ($zip->open($zipPath, ZipArchive::CREATE) !== TRUE) {
-    //         return response()->json(['error' => 'Failed to create zip file'], 500);
-    //     }
-
-    //     foreach ($tempFiles as $file) {
-    //         $zip->addFile($file, basename($file));
-    //     }
-
-    //     $zip->close();
-
-    //     foreach ($tempFiles as $file) {
-    //         unlink($file);
-    //     }
-
-    //     return response()->download($zipPath)->deleteFileAfterSend(true);
-    // }
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function report(string $id)
     {
         //
     }

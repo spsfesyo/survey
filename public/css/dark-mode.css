@@ -1,0 +1,28 @@
+body.dark-mode {
+    background: #121212;
+    color: #e4e6eb;
+}
+
+body.dark-mode .navbar-bg,
+body.dark-mode .main-navbar {
+    background: #1f2933 !important;
+}
+
+body.dark-mode .main-sidebar {
+    background: #181818 !important;
+}
+
+body.dark-mode .card {
+    background: #1c1c1c;
+    color: #e4e6eb;
+}
+
+body.dark-mode .table {
+    color: #e4e6eb;
+}
+
+body.dark-mode .form-control {
+    background: #222;
+    color: #fff;
+    border-color: #333;
+}

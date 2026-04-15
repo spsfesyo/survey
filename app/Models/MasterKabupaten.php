@@ -39,10 +39,10 @@ class MasterKabupaten extends Model
     {
         return $this->hasMany(AturanHadiahSurvey::class, 'master_kabupaten_id', 'id');
     }
-    public function historyPemenang()
-    {
-        return $this->hasMany(HistoryPemenangSurvey::class, 'master_kabupaten_id', 'id');
-    }
+    // public function historyPemenang()
+    // {
+    //     return $this->hasMany(::class, 'master_kabupaten_id', 'id');
+    // }
     public function area()
     {
         return $this->belongsTo(MasterAreaSurvey::class, 'master_area_id', 'id');

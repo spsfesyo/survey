@@ -219,7 +219,7 @@
                                         <div class="d-flex" style="gap: 10px;">
                                             <a href="{{ route('form-pertanyaan-pengiriman') }}"
                                                 class="btn btn-light">Back</a>
-                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                            <button type="submit" class="btn btn-primary">Next</button>
                                         </div>
                                     </div>
                                 </form>
@@ -329,7 +329,7 @@
                     isValid = false;
                     messages.push("Anda wajib mengambil foto terlebih dahulu sebelum submit.");
                 }
-                
+
                 if (!isValid) {
                     e.preventDefault();
                     Swal.fire({

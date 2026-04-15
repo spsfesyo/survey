@@ -48,14 +48,29 @@
                 </a>
             </li>
 
+            {{-- untuk report kualitas bata blesscon dan superior --}}
+            <li class="{{ Request::is('view-report') ? 'active' : '' }}">
+                <a class="nav-link" href={{ route('view-report') }}>
+                    <i class="fas fa-bookmark"></i> <span>Report</span>
+                </a>
+            </li>
+
+
+
+            {{-- <li class="{{ Request::is('konfig-survey') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('konfig-survey') }}">
+                    <i class="fas fa-cogs"></i> <span>Konfigurasi Survey</span>
+                </a>
+            </li> --}}
+
 
             {{-- Menu khusus untuk Role ID 1 (Admin) --}}
             @if (auth()->user()->role_id == 1)
-                <li class="{{ Request::is('admin-plot-random') ? 'active' : '' }}">
+                {{-- <li class="{{ Request::is('admin-plot-random') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('admin-plot-random') }}">
                         <i class="fas fa-random"></i> <span>Plotting Random</span>
                     </a>
-                </li>
+                </li> --}}
 
                 <li class="{{ Request::is('admin-list-pertanyaan') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('admin-list-pertanyaan') }}">
@@ -68,6 +83,12 @@
                         <i class="fas fa-users-cog"></i> <span>Blasting Wa</span>
                     </a>
                 </li>
+                <li class="{{ Request::is('konfig-survey') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('konfig-survey') }}">
+                        <i class="fas fa-cogs"></i> <span>Konfigurasi Survey</span>
+                    </a>
+                </li>
+
 
                 {{-- <li class="{{ Request::is('export-survey-pdf') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('export-survey-pdf') }}">

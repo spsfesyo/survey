@@ -45,7 +45,7 @@
                     <div class="col-lg-12 col-md-12 col-12 col-sm-12">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">Tabel Hasil Data Respondent Merek Blesscon</h4>
+                                <h4 class="mb-0">Tabel Hasil Data Respondent Merek Blesscon keseluruhan</h4>
                                 <a href="{{ route('export.respondent', 1) }}" class="btn btn-icon icon-left btn-success">
                                     <i class="fas fa-download"></i> Excel
                                 </a>
@@ -154,7 +154,7 @@
                     <div class="col-lg-12 col-md-12 col-12 col-sm-12">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">Tabel Hasil Data Respondent Merek Superior</h4>
+                                <h4 class="mb-0">Tabel Hasil Data Respondent Merek Superior Keseluruhan</h4>
                                 <a href="{{ route('export.respondent', 2) }}
                                 "
                                     class="btn btn-icon icon-left btn-success">
@@ -259,7 +259,7 @@
                 </div>
 
                 {{-- Diagram Lingkaran --}}
-                <div class="row">
+                {{-- <div class="row">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
@@ -270,7 +270,7 @@
                             </div>
 
                             <div class="card-body">
-                                {{-- Wrapper untuk semua chart --}}
+                                <!-- Wrapper untuk semua chart -->
                                 <div id="pieChartContainer">
                                     @foreach ($chartPaginated as $index => $chart)
                                         <div class="chart-page" style="display: {{ $loop->first ? 'block' : 'none' }};">
@@ -299,10 +299,10 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
                 {{-- Diagram batang --}}
-                <div class="row">
+                {{-- <div class="row">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
@@ -340,20 +340,25 @@
                                     @endforeach
                                 </div>
 
-                                {{-- Pagination untuk Bar Chart --}}
+                                <!-- Pagination untuk Bar Chart -->>
                                 <div class="d-flex justify-content-center">
                                     {{ $barChartPaginated->appends(request()->except('barchart'))->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
+
+
+               
+
+
             </div>
         </section>
     </div>
 
 
-    <div id="chartDownloadArea" style="position: absolute; left: -9999px; top: 0;">
+    {{-- <div id="chartDownloadArea" style="position: absolute; left: -9999px; top: 0;">
         @foreach ($chartDataAll as $chart)
             <div data-title="{{ $chart['label'] }}">
                 <x-charts.pie :chartId="'hidden_pie_' . $chart['chartId']" :labels="$chart['labels']" :values="$chart['values']" label="{{ $chart['label'] }}" />
@@ -365,12 +370,16 @@
                 <x-charts.bar :chartId="'hidden_bar_' . $barChart['questionId']" :labels="$barChart['labels']" :values="$barChart['values']" :labelName="$barChart['label']" />
             </div>
         @endforeach
-    </div>
+    </div> --}}
+
 
 
 
 
 @endsection
+
+
+
 
 @push('scripts')
     <!-- ZIP Download Libraries -->
@@ -471,141 +480,3 @@
     <script src="{{ asset('js/scripts.js') }}"></script> {{-- penting! --}}
     <script src="{{ asset('js/custom.js') }}"></script>
 @endpush
-
-
-
-
-
-
-
-{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script> --}}
-
-{{-- <script>
-        function downloadAllCharts(type) {
-            const zip = new JSZip();
-            const canvases = document.querySelectorAll(`#chartDownloadArea canvas[id^="hidden_${type}_"]`);
-
-            if (canvases.length === 0) {
-                alert('Tidak ada chart untuk di-download!');
-                return;
-            }
-
-            let processed = 0;
-
-            canvases.forEach((canvas, index) => {
-                // Tunggu render (jika perlu delay kecil)
-                setTimeout(() => {
-                    canvas.toBlob(blob => {
-                        if (blob) {
-                            zip.file(`chart_${type}_${index + 1}.jpg`, blob);
-                        } else {
-                            console.warn(`Chart ${index + 1} gagal dikonversi`);
-                        }
-
-                        processed++;
-                        if (processed === canvases.length) {
-                            zip.generateAsync({
-                                type: "blob"
-                            }).then(content => {
-                                saveAs(content, `${type}_charts.zip`);
-                            });
-                        }
-                    }, 'image/jpeg', 0.95);
-                }, 300); // memberi waktu render jika perlu
-            });
-        }
-    </script> --}}
-
-
-
-
-
-<!-- Custom Diagram Page Script -->
-{{-- <script src="{{ asset('js/diagram-page.js') }}"></script> --}}
-{{-- <script>
-        async function downloadAllChartsAsZip() {
-            const zip = new JSZip();
-            const canvases = document.querySelectorAll('canvas[id^="pieChart-"], canvas[id^="pieChart"]');
-
-            let counter = 1;
-            for (let canvas of canvases) {
-                const base64 = canvas.toDataURL('image/png');
-                const blob = await (await fetch(base64)).blob();
-
-                let label = canvas.closest('.card').querySelector('h6')?.innerText.trim() || `diagram_${counter}`;
-                zip.file(`${label}.png`, blob);
-                counter++;
-            }
-
-            zip.generateAsync({
-                    type: "blob"
-                })
-                .then((content) => saveAs(content, "semua-diagram.zip"))
-                .catch((err) => console.error('Error membuat zip:', err));
-        }
-    </script> --}}
-
-{{-- <script>
-        // Contoh ambil semua canvas chart dan kirim ke backend
-        let charts = [];
-        document.querySelectorAll('canvas').forEach((canvas) => {
-            charts.push({
-                dataUrl: canvas.toDataURL('image/jpeg')
-            });
-        });
-
-        fetch('/download-pie-charts', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    charts: charts
-                })
-            }).then(response => response.blob())
-            .then(blob => {
-                let url = window.URL.createObjectURL(blob);
-                let a = document.createElement('a');
-                a.href = url;
-                a.download = "pie_charts.zip";
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            }).catch(err => console.error('Download error:', err));
-    </script> --}}
-
-{{-- <script>
-        function downloadAllCharts(type) {
-            // Tampilkan loading indicator
-            const btn = event.target;
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuat ZIP...';
-            btn.disabled = true;
-
-            // Lakukan request download
-            fetch(`/download-charts/${type}`)
-                .then(response => {
-                    if (response.ok) return response.blob();
-                    throw new Error('Network response was not ok');
-                })
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `all_${type}_charts.zip`;
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Gagal mendownload: ' + error.message);
-                })
-                .finally(() => {
-                    btn.innerHTML = originalHtml;
-                    btn.disabled = false;
-                });
-        }
-    </script> --}}
