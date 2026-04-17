@@ -24,7 +24,7 @@ class RespondentController extends Controller
 
     public function index()
     {
-        return view('form-utama');
+        return redirect()->route('form-utama');
     }
 
 
