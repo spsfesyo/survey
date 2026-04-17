@@ -24,29 +24,29 @@ class RespondentController extends Controller
 
     public function index()
     {
-        return view('home');
+        return view('form-utama');
     }
 
 
-    public function create(Request $request)
-    {
-        $request->validate([
-            'kode_unik' => 'required|string|size:10'
-        ]);
+    // public function create(Request $request)
+    // {
+    //     $request->validate([
+    //         'kode_unik' => 'required|string|size:10'
+    //     ]);
 
-        $outlet = MasterOutletSurvey::where('kode_unik', $request->kode_unik)
-            ->where('status_kode_unik', 'Y')
-            ->first();
+    //     $outlet = MasterOutletSurvey::where('kode_unik', $request->kode_unik)
+    //         ->where('status_kode_unik', 'Y')
+    //         ->first();
 
-        if (!$outlet) {
-            return redirect()->back()->with('error', 'Kode unik tidak valid atau sudah digunakan.');
-        }
+    //     if (!$outlet) {
+    //         return redirect()->back()->with('error', 'Kode unik tidak valid atau sudah digunakan.');
+    //     }
 
-        Session::put('master_outlet_survey_id', $outlet->id);
-        Session::put('kode_unik', $request->kode_unik);
+    //     Session::put('master_outlet_survey_id', $outlet->id);
+    //     Session::put('kode_unik', $request->kode_unik);
 
-        return redirect()->route('form-utama')->with('success', 'Kode diterima. Silakan isi form.');
-    }
+    //     return redirect()->route('form-utama')->with('success', 'Kode diterima. Silakan isi form.');
+    // }
 
     public function getFormUtama()
     {

@@ -72,9 +72,9 @@
                                                         @foreach ($periode as $index => $item)
                                                             <tr>
                                                                 <td>{{ $index + 1 }}</td>
-                                                                <td>{{ $item->nama_periode }}</td>
-                                                                <td>{{ $item->tanggal_mulai }}</td>
-                                                                <td>{{ $item->tanggal_selesai }}</td>
+                                                                <td>{{ $item->nama_periode ?? ''}}</td>
+                                                                <td>{{ $item->tanggal_mulai ?? ''}}</td>
+                                                                <td>{{ $item->tanggal_selesai ?? ''}}</td>
                                                                 <td>
                                                                     @if ($item->status == 'aktif')
                                                                         <div class="badge badge-success">Aktif</div>
@@ -130,11 +130,11 @@
                                                         @foreach ($hadiah as $index => $item)
                                                             <tr>
                                                                 <td>{{ $index + 1 }}</td>
-                                                                <td>{{ $item->periode->tanggal_mulai }} -
-                                                                    {{ $item->periode->tanggal_selesai }}</td>
-                                                                <td>{{ $item->kode_hadiah }}</td>
-                                                                <td>{{ $item->nama_hadiah }}</td>
-                                                                <td>{{ $item->jumlah_hadiah }}</td>
+                                                                <td>{{ $item->periode->tanggal_mulai ??'' }} -
+                                                                    {{ $item->periode->tanggal_selesai ??'' }}</td>
+                                                                <td>{{ $item->kode_hadiah ?? '' }}</td>
+                                                                <td>{{ $item->nama_hadiah ?? '' }}</td>
+                                                                <td>{{ $item->jumlah_hadiah ?? ''   }}</td>
                                                                 <td>
                                                                     @if ($item->status == 'Y')
                                                                         <div class="badge badge-success">Aktif</div>

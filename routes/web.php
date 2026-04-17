@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 // index awal
-Route::get('/', [RespondentController::class, 'getFormUtama'])->name('home');
+Route::get('/', [RespondentController::class, 'index'])->name('home');
 
 // Route::post('/submit-kode-unik', [RespondentController::class, 'create'])->name('submit-kode-unik');
 
