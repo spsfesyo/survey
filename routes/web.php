@@ -63,6 +63,9 @@ use Illuminate\Support\Facades\Route;
 // index awal
 Route::get('/', [RespondentController::class, 'index'])->name('home');
 
+// khusus dari visit sales
+Route::get('/visit-entry/{token}', [RespondentController::class, 'index']);
+
 // Route::post('/submit-kode-unik', [RespondentController::class, 'create'])->name('submit-kode-unik');
 
 Route::get('/form-utama', [RespondentController::class, 'getFormUtama'])->name('form-utama');

@@ -22,33 +22,60 @@ use Illuminate\Support\Facades\Crypt;
 
 class RespondentController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, $token = null)
     {
-        $token = $request->token;
-
         try {
 
+            // 1️⃣ Ambil token (query prioritas)
+            $token = $request->store ?? $token;
+
+            if (!$token) {
+                abort(403, 'Token tidak ada');
+            }
+
+            // 2️⃣ Clean token
+            $token = trim($token);
+            $token = preg_replace('/[^A-Za-z0-9=\/+]/', '', $token);
+
+            // 3️⃣ Decrypt
             $decrypt = Crypt::decryptString($token);
 
-            list($idFormVisitSales, $spsName) = explode('|', $decrypt);
+            // 4️⃣ Parsing fleksibel
+            $data = explode('|', $decrypt);
 
-            $outlet = MasterOutletSurvey::where('sps_internal_name', $spsName)
-                ->first();
+            if (count($data) == 2) {
+                // format: id|spsName
+                $idFormVisitSales = $data[0];
+                $spsName = $data[1];
+            } else {
+                // format: hanya spsName
+                $idFormVisitSales = null;
+                $spsName = $decrypt;
+            }
+
+            // 5️⃣ Cari outlet
+            $outlet = MasterOutletSurvey::where('sps_internal_name', $spsName)->first();
 
             if (!$outlet) {
                 abort(404, 'Outlet tidak ditemukan');
             }
 
+            // 6️⃣ Simpan session
             session([
                 'master_outlet_survey_id' => $outlet->id,
-                'visit_sales_form_id' => $idFormVisitSales,
+                'visit_sales_form_id' => $idFormVisitSales, // boleh null
                 'sps_name' => $spsName,
             ]);
 
+            // 7️⃣ Redirect ke form
             return redirect()->route('form-utama');
         } catch (\Exception $e) {
 
-            abort(403, 'Token tidak valid');
+            dd([
+                'error' => 'Decrypt gagal',
+                'message' => $e->getMessage(),
+                'token' => $token ?? null
+            ]);
         }
     }
 
@@ -640,12 +667,27 @@ class RespondentController extends Controller
         /* =======================
      * 8️⃣ CLEAR SESSION
      * ======================= */
-        $visitSalesId = session('visit_sales_id');
+        // $visitSalesId = session('visit_sales_id');
+        // $spsName = session('sps_name');
+
+        // $encrypted = Crypt::encryptString(
+        //     $visitSalesId . '|' . $spsName
+        // );
+
+        // session()->forget([
+        //     'form_utama',
+        //     'form_kualitas',
+        //     'form_harga',
+        //     'form_pengiriman',
+        //     'form_pelayanan',
+        //     'form_gimmick',
+        //     'master_outlet_survey_id',
+        //     'kode_unik'
+        // ]);
+
         $spsName = session('sps_name');
 
-        $encrypted = Crypt::encryptString(
-            $visitSalesId . '|' . $spsName
-        );
+        $encrypted = Crypt::encryptString($spsName);
 
         session()->forget([
             'form_utama',
@@ -655,7 +697,7 @@ class RespondentController extends Controller
             'form_pelayanan',
             'form_gimmick',
             'master_outlet_survey_id',
-            'kode_unik'
+            'kode_unik',
         ]);
 
         /* =======================
@@ -670,8 +712,8 @@ class RespondentController extends Controller
         //         ->with('success', 'Terima kasih atas partisipasi Anda! Anda belum beruntung kali ini.');
         // }
 
-        return redirect(
-            'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit/?token=' . urlencode($encrypted)
+        return redirect()->away(
+            'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit/' . urlencode($encrypted)
         );
 
         return redirect('/dummy-finish?token=' . urlencode($encrypted));
