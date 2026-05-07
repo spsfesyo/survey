@@ -13,7 +13,37 @@ use App\Http\Controllers\DoorprizeController;
 use App\Http\Controllers\RespondentController;
 use App\Http\Controllers\testController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+
+
+// Route::get('/dummy-visit-sales', function () {
+
+//     $idFormVisitSales = 9999;
+
+//     $spsName = 'BANGUN CIPTA LESTARI, Surabaya - Lakarsantri';
+
+//     $token = Crypt::encryptString(
+//         $idFormVisitSales . '|' . $spsName
+//     );
+
+//     return redirect('/?token=' . urlencode($token));
+// });
+
+
+// Route::get('/dummy-finish', function (Request $request) {
+
+//     $decrypt = Crypt::decryptString($request->token);
+
+//     list($idFormVisitSales, $spsName) = explode('|', $decrypt);
+
+//     dd([
+//         'idFormVisitSales' => $idFormVisitSales,
+//         'spsName' => $spsName
+//     ]);
+// });
 
 /*
 |--------------------------------------------------------------------------

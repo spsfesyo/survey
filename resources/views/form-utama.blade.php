@@ -81,19 +81,20 @@
 
                                     <div class="form-group" style="margin-top: 20px;">
                                         <label>Provinsi Lokasi Toko</label>
-                                        <select id="provinsi" name="provinsi" class="form-control">
-                                            <option value="">-- Pilih Provinsi --</option>
-                                            @foreach ($provinsi as $item)
-                                                <option value="{{ $item->id }}">{{ $item->nama_provinsi }}</option>
-                                            @endforeach
-                                        </select>
+
+                                        <input type="text" class="form-control"
+                                            value="{{ $selectedProvinsi->nama_provinsi }}" readonly>
+
+                                        <input type="hidden" name="provinsi" value="{{ $selectedProvinsi->id }}">
                                     </div>
 
                                     <div class="form-group" style="margin-top: 20px;">
                                         <label>Kabupaten/Kota Lokasi Toko</label>
-                                        <select class="form-control" name="kabupaten" id="kabupaten" required>
-                                            <option value="">-- Pilih Kabupaten --</option>
-                                        </select>
+
+                                        <input type="text" class="form-control"
+                                            value="{{ $selectedKabupaten->nama_kabupaten }}" readonly>
+
+                                        <input type="hidden" name="kabupaten" value="{{ $selectedKabupaten->id }}">
                                     </div>
 
                                     <div class="form-group">

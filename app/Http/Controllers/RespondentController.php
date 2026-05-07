@@ -18,15 +18,39 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Crypt;
 
 class RespondentController extends Controller
 {
-
-    public function index()
+    public function index(Request $request)
     {
-        return redirect()->route('form-utama');
-    }
+        $token = $request->token;
 
+        try {
+
+            $decrypt = Crypt::decryptString($token);
+
+            list($idFormVisitSales, $spsName) = explode('|', $decrypt);
+
+            $outlet = MasterOutletSurvey::where('sps_internal_name', $spsName)
+                ->first();
+
+            if (!$outlet) {
+                abort(404, 'Outlet tidak ditemukan');
+            }
+
+            session([
+                'master_outlet_survey_id' => $outlet->id,
+                'visit_sales_form_id' => $idFormVisitSales,
+                'sps_name' => $spsName,
+            ]);
+
+            return redirect()->route('form-utama');
+        } catch (\Exception $e) {
+
+            abort(403, 'Token tidak valid');
+        }
+    }
 
     // public function create(Request $request)
     // {
@@ -50,24 +74,60 @@ class RespondentController extends Controller
 
     public function getFormUtama()
     {
-        // Cek apakah email sudah terdaftar
-        // Ambil data provinsi dan kota
+        //old
 
-        $provinsi = MasterProvinsi::all();
-        // $kota = MasterKotaSurvey::all();
-        $pertanyaanFormUtama = MasterPertanyaan::with(['tipePertanyaan', 'options'])
+        // // Cek apakah email sudah terdaftar
+        // // Ambil data provinsi dan kota
+
+        // $provinsi = MasterProvinsi::all();
+        // // $kota = MasterKotaSurvey::all();
+        // $pertanyaanFormUtama = MasterPertanyaan::with(['tipePertanyaan', 'options'])
+        //     ->where('master_section_id', 1)
+        //     ->orderBy('order')
+        //     ->get();
+
+        // $merekBataRingan = MasterJenisPertanyaan::all();
+        // // $pertanyaans = MasterPertanyaan::with('options')->where('master_section_id',1)->orderBy('order')->get();
+
+
+        // // dd($pertanyaans);
+        // // return view('form_utama', compact('pertanyaanFormUtama'));
+
+        // return view('form-utama', compact('provinsi',  'pertanyaanFormUtama', 'merekBataRingan'));
+
+        $outletId = session('master_outlet_survey_id');
+
+        $outlet = MasterOutletSurvey::find($outletId);
+
+        if (!$outlet) {
+            return redirect()->route('home');
+        }
+
+        $selectedKabupaten = MasterKabupaten::find(
+            $outlet->master_kabupaten_id
+        );
+
+        $selectedProvinsi = MasterProvinsi::find(
+            $selectedKabupaten->provinsi_id
+        );
+
+        $pertanyaanFormUtama = MasterPertanyaan::with([
+            'tipePertanyaan',
+            'options'
+        ])
             ->where('master_section_id', 1)
             ->orderBy('order')
             ->get();
 
         $merekBataRingan = MasterJenisPertanyaan::all();
-        // $pertanyaans = MasterPertanyaan::with('options')->where('master_section_id',1)->orderBy('order')->get();
 
-
-        // dd($pertanyaans);
-        // return view('form_utama', compact('pertanyaanFormUtama'));
-
-        return view('form-utama', compact('provinsi',  'pertanyaanFormUtama', 'merekBataRingan'));
+        return view('form-utama', compact(
+            'outlet',
+            'selectedKabupaten',
+            'selectedProvinsi',
+            'pertanyaanFormUtama',
+            'merekBataRingan'
+        ));
     }
 
 
@@ -580,6 +640,13 @@ class RespondentController extends Controller
         /* =======================
      * 8️⃣ CLEAR SESSION
      * ======================= */
+        $visitSalesId = session('visit_sales_id');
+        $spsName = session('sps_name');
+
+        $encrypted = Crypt::encryptString(
+            $visitSalesId . '|' . $spsName
+        );
+
         session()->forget([
             'form_utama',
             'form_kualitas',
@@ -603,9 +670,11 @@ class RespondentController extends Controller
         //         ->with('success', 'Terima kasih atas partisipasi Anda! Anda belum beruntung kali ini.');
         // }
 
-        return redirect()->route('home')
-            ->with('success', 'Terima kasih atas partisipasi Anda!');
+        return redirect(
+            'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit/?token=' . urlencode($encrypted)
+        );
 
+        return redirect('/dummy-finish?token=' . urlencode($encrypted));
 
         // public function checkDuplicatePhone(Request $request)
         // {
