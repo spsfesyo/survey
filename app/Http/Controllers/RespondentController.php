@@ -34,8 +34,8 @@ class RespondentController extends Controller
             }
 
             // 2️⃣ Clean token
-            $token = trim($token);
-            $token = preg_replace('/[^A-Za-z0-9=\/+]/', '', $token);
+            // $token = trim($token);
+            // $token = preg_replace('/[^A-Za-z0-9=\/+]/', '', $token);
 
             // 3️⃣ Decrypt
             $decrypt = Crypt::decryptString($token);
@@ -60,12 +60,17 @@ class RespondentController extends Controller
                 abort(404, 'Outlet tidak ditemukan');
             }
 
+            session([
+                'raw_token' => $token
+            ]);
+
             // 6️⃣ Simpan session
             session([
                 'master_outlet_survey_id' => $outlet->id,
                 'visit_sales_form_id' => $idFormVisitSales, // boleh null
                 'sps_name' => $spsName,
             ]);
+
 
             // 7️⃣ Redirect ke form
             return redirect()->route('form-utama');
@@ -685,9 +690,17 @@ class RespondentController extends Controller
         //     'kode_unik'
         // ]);
 
+        $visitSalesId = session('visit_sales_form_id');
         $spsName = session('sps_name');
 
-        $encrypted = Crypt::encryptString($spsName);
+        if ($visitSalesId) {
+            $payload = $visitSalesId . '|' . $spsName;
+        } else {
+            $payload = $spsName;
+        }
+
+        $encrypted = Crypt::encryptString($payload);
+
 
         session()->forget([
             'form_utama',
@@ -712,11 +725,20 @@ class RespondentController extends Controller
         //         ->with('success', 'Terima kasih atas partisipasi Anda! Anda belum beruntung kali ini.');
         // }
 
+        // return redirect()->away(
+        //     'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit/' . urlencode($encrypted)
+        // );
+
         return redirect()->away(
-            'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit/' . urlencode($encrypted)
+            'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit?token=' . urlencode($encrypted)
         );
 
-        return redirect('/dummy-finish?token=' . urlencode($encrypted));
+        // return redirect('/dummy-finish?token=' . urlencode($encrypted));
+
+        // return redirect()->away(
+        //     'http://127.0.0.1:8000/dummy-finish?token=' . urlencode($encrypted)
+        // );
+
 
         // public function checkDuplicatePhone(Request $request)
         // {

@@ -62,6 +62,10 @@
 
                                 <form method="POST" action="{{ route('submit-final') }}">
                                     @csrf
+                                    {{-- dibawah ini untuk hidden menyimpan session sps_name untuk dikembalikan dalam bentuk token ke dalam visit sales --}}
+                                    <input type="hidden" name="token" value="{{ session('raw_token') }}">
+                                    {{-- <input type="hidden" name="visit_sales_form_id"
+                                        value="{{ session('visit_sales_form_id') }}"> --}}
 
                                     <div class="form-group">
                                         <label style="font-weight:600;">
@@ -93,7 +97,7 @@
                                         </div>
                                     </div>
 
-                                     <div class="form-group d-flex justify-content-between">
+                                    <div class="form-group d-flex justify-content-between">
                                         {{-- <a href="#" class="btn btn-outline-warning"
                                             onclick="document.getElementById('formSurveyPelayanan').reset(); return false;">Clear
                                             Form</a> --}}

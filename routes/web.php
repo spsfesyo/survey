@@ -19,6 +19,21 @@ use Illuminate\Support\Facades\Route;
 
 
 
+// Route::get('/debug-token', function (Request $request) {
+
+//     try {
+//         $decrypt = Crypt::decryptString($request->store);
+
+//         dd([
+//             'full_url' => $request->fullUrl(),
+//             'token' => $request->store,
+//             'hasil_decrypt' => $decrypt
+//         ]);
+//     } catch (\Exception $e) {
+//         dd($e->getMessage());
+//     }
+// });
+
 // Route::get('/dummy-visit-sales', function () {
 
 //     $idFormVisitSales = 9999;
@@ -45,16 +60,29 @@ use Illuminate\Support\Facades\Route;
 //     ]);
 // });
 
+// Route::get('/dummy-finish', function (Request $request) {
+
+//     $token = urldecode($request->token);
+
+//     $decrypt = Crypt::decryptString($token);
+
+//     return dd([
+//         'token_raw' => $request->token,
+//         'token_decode' => $token,
+//         'hasil_decrypt' => $decrypt
+//     ]);
+// });
+
 /*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+    |--------------------------------------------------------------------------
+    | Web Routes
+    |--------------------------------------------------------------------------
+    |
+    | Here is where you can register web routes for your application. These
+    | routes are loaded by the RouteServiceProvider and all of them will
+    | be assigned to the "web" middleware group. Make something great!
+    |
+    */
 
 // Route::get('/', function () {
 //     return view('home');
