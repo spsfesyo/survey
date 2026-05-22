@@ -89,7 +89,11 @@ use Illuminate\Support\Facades\Route;
 // });
 
 // index awal
-Route::get('/', [RespondentController::class, 'index'])->name('home');
+// Route::get('/', [RespondentController::class, 'index'])->name('home');
+
+Route::get('/', function () {
+    return view('home'); // bebas (landing page / info)
+})->name('home');
 
 // khusus dari visit sales
 Route::get('/visit-entry/{token}', [RespondentController::class, 'index']);

@@ -8,13 +8,14 @@
 @endpush
 
 @section('main')
-    <div class="card card-primary">
+
+
+    {{-- <div class="card ">
         <div class="card-header">
-            <h4>Masukkan Kode Unik Anda</h4>
+            <h4>Selamat Datang di Website Survey Kepuasan Pelanggan</h4>
         </div>
 
-        <div class="card-body">
-            {{-- <form method="POST" action="{{ route('submit-unique-code') }}" class="needs-validation" novalidate> --}}
+         <div class="card-body">
             <form method="POST" action="{{ route('submit-kode-unik') }}" class="needs-validation" novalidate>
                 @csrf
 
@@ -40,7 +41,7 @@
                 </div>
             </form>
         </div>
-    </div>
+    </div> --}}
 @endsection
 
 @push('scripts')

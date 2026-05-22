@@ -75,12 +75,10 @@ class RespondentController extends Controller
             // 7️⃣ Redirect ke form
             return redirect()->route('form-utama');
         } catch (\Exception $e) {
+            Log::error('Decrypt gagal: ' . $e->getMessage());
 
-            dd([
-                'error' => 'Decrypt gagal',
-                'message' => $e->getMessage(),
-                'token' => $token ?? null
-            ]);
+            return redirect('/')
+                ->with('error', 'Link tidak valid atau sudah expired.');
         }
     }
 
@@ -135,13 +133,21 @@ class RespondentController extends Controller
             return redirect()->route('home');
         }
 
-        $selectedKabupaten = MasterKabupaten::find(
-            $outlet->master_kabupaten_id
-        );
+        // $selectedKabupaten = MasterKabupaten::find(
+        //     $outlet->master_kabupaten_id
+        // );
 
-        $selectedProvinsi = MasterProvinsi::find(
-            $selectedKabupaten->provinsi_id
-        );
+
+
+        // $selectedProvinsi = MasterProvinsi::find(
+        //     $selectedKabupaten->provinsi_id
+        // );
+
+        $selectedKabupaten = MasterKabupaten::find($outlet->master_kabupaten_id);
+
+        $selectedProvinsi = $selectedKabupaten
+            ? MasterProvinsi::find($selectedKabupaten->provinsi_id)
+            : null;
 
         $pertanyaanFormUtama = MasterPertanyaan::with([
             'tipePertanyaan',
@@ -525,7 +531,7 @@ class RespondentController extends Controller
         /* =======================
      * 2️⃣ SIMPAN SESSION FORM TERAKHIR
      * ======================= */
-        session(['form_gimmick' => $request->all()]);
+        // session(['form_gimmick' => $request->all()]);
 
         $formUtama      = session('form_utama', []);
         $formKualitas   = session('form_kualitas', []);
@@ -537,8 +543,24 @@ class RespondentController extends Controller
         $outletId = session('master_outlet_survey_id');
         $kodeUnik = session('kode_unik');
 
-        if (!$outletId || !$kodeUnik || empty($formUtama)) {
-            return redirect()->route('home')->with('error', 'Sesi tidak lengkap. Silakan ulangi.');
+        // if (!$outletId || !$kodeUnik || empty($formUtama)) {
+        //     // return redirect()->route('home')->with('error', 'Sesi tidak lengkap. Silakan ulangi.');
+        //      return redirect('/')->with('error', 'Sesi tidak lengkap. Silakan ulangi.');
+
+        // }
+
+        // if (!$outletId) {
+        //     return redirect('/')->with('error', 'Outlet tidak ditemukan. Ulangi dari awal.');
+        // }
+
+        // if (empty($formUtama)) {
+        //     return redirect()->route('form-utama')
+        //         ->with('error', 'Silakan isi form utama terlebih dahulu.');
+        // }
+
+        if (!$outletId || empty($formUtama)) {
+            return redirect('/')
+                ->with('error', 'Sesi tidak lengkap. Silakan ulangi dari awal.');
         }
 
         /* =======================
