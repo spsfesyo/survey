@@ -24,56 +24,107 @@ class RespondentController extends Controller
 {
     public function index(Request $request, $token = null)
     {
+        // try {
+
+        //     // 1️⃣ Ambil token (query prioritas)
+        //     $token = $request->store ?? $token;
+
+        //     if (!$token) {
+        //         abort(403, 'Token tidak ada');
+        //     }
+
+        //     // 2️⃣ Clean token
+        //     // $token = trim($token);
+        //     // $token = preg_replace('/[^A-Za-z0-9=\/+]/', '', $token);
+
+        //     // 3️⃣ Decrypt
+        //     $decrypt = Crypt::decryptString($token);
+
+        //     // 4️⃣ Parsing fleksibel
+        //     $data = explode('|', $decrypt);
+
+        //     if (count($data) == 2) {
+        //         // format: id|spsName
+        //         $idFormVisitSales = $data[0];
+        //         $spsName = $data[1];
+        //     } else {
+        //         // format: hanya spsName
+        //         $idFormVisitSales = null;
+        //         $spsName = $decrypt;
+        //     }
+
+        //     // 5️⃣ Cari outlet
+        //     $outlet = MasterOutletSurvey::where('sps_internal_name', $spsName)->first();
+
+        //     if (!$outlet) {
+        //         abort(404, 'Outlet tidak ditemukan');
+        //     }
+
+        //     session([
+        //         'raw_token' => $token,
+        //         'redirect_url' => $request->fullUrl(),
+        //     ]);
+
+        //     // 6️⃣ Simpan session
+        //     session([
+        //         'master_outlet_survey_id' => $outlet->id,
+        //         'visit_sales_form_id' => $idFormVisitSales, // boleh null
+        //         'sps_name' => $spsName,
+        //     ]);
+
+
+        //     // 7️⃣ Redirect ke form
+        //     return redirect()->route('form-utama');
+        // } catch (\Exception $e) {
+        //     Log::error('Decrypt gagal: ' . $e->getMessage());
+
+        //     return redirect('/')
+        //         ->with('error', 'Link tidak valid atau sudah expired.');
+        // }
+
+
         try {
 
-            // 1️⃣ Ambil token (query prioritas)
-            $token = $request->store ?? $token;
+            // ✅ pisahkan token & store
+            $pathToken = $token;
+            $store = $request->store;
 
-            if (!$token) {
-                abort(403, 'Token tidak ada');
+            if (!$store || !$pathToken) {
+                abort(403, 'Token tidak lengkap');
             }
 
-            // 2️⃣ Clean token
-            // $token = trim($token);
-            // $token = preg_replace('/[^A-Za-z0-9=\/+]/', '', $token);
+            // ✅ decrypt dari STORE (bukan token)
+            $decrypt = Crypt::decryptString($store);
 
-            // 3️⃣ Decrypt
-            $decrypt = Crypt::decryptString($token);
-
-            // 4️⃣ Parsing fleksibel
             $data = explode('|', $decrypt);
 
             if (count($data) == 2) {
-                // format: id|spsName
                 $idFormVisitSales = $data[0];
                 $spsName = $data[1];
             } else {
-                // format: hanya spsName
                 $idFormVisitSales = null;
                 $spsName = $decrypt;
             }
 
-            // 5️⃣ Cari outlet
             $outlet = MasterOutletSurvey::where('sps_internal_name', $spsName)->first();
 
             if (!$outlet) {
                 abort(404, 'Outlet tidak ditemukan');
             }
 
+            // ✅ simpan untuk redirect nanti
             session([
-                'raw_token' => $token,
-                'redirect_url' => $request->fullUrl(),
+                'redirect_token' => $pathToken,
+                'redirect_store' => $store,
             ]);
 
-            // 6️⃣ Simpan session
+            // session utama
             session([
                 'master_outlet_survey_id' => $outlet->id,
-                'visit_sales_form_id' => $idFormVisitSales, // boleh null
+                'visit_sales_form_id' => $idFormVisitSales,
                 'sps_name' => $spsName,
             ]);
 
-
-            // 7️⃣ Redirect ke form
             return redirect()->route('form-utama');
         } catch (\Exception $e) {
             Log::error('Decrypt gagal: ' . $e->getMessage());
@@ -758,20 +809,18 @@ class RespondentController extends Controller
         //     'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit?token=' . urlencode($encrypted)
         // );
 
-        $redirectUrl = session('redirect_url');
+        $token = session('redirect_token');
+        $store = session('redirect_store');
 
-        if (!$redirectUrl) {
-            return redirect('/')->with('error', 'Redirect URL tidak ditemukan.');
+        if (!$token || !$store) {
+            return redirect('/')->with('error', 'Token redirect tidak ditemukan.');
         }
 
-        // 🔥 ganti domain survey → ess
-        $redirectUrl = str_replace(
-            'survey.edpapp.com:2096',
-            'esstesting.edpapp.com:2096',
-            $redirectUrl
-        );
+        $url = 'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit/'
+            . $token
+            . '?store=' . urlencode($store);
 
-        return redirect()->away($redirectUrl);
+        return redirect()->away($url);
 
         // return redirect('/dummy-finish?token=' . urlencode($encrypted));
 
