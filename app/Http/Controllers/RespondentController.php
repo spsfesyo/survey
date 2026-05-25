@@ -61,7 +61,8 @@ class RespondentController extends Controller
             }
 
             session([
-                'raw_token' => $token
+                'raw_token' => $token,
+                'redirect_url' => $request->fullUrl(),
             ]);
 
             // 6️⃣ Simpan session
@@ -721,7 +722,7 @@ class RespondentController extends Controller
             $payload = $spsName;
         }
 
-        $encrypted = Crypt::encryptString($payload);
+        // $encrypted = Crypt::encryptString($payload);
 
 
         session()->forget([
@@ -751,9 +752,26 @@ class RespondentController extends Controller
         //     'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit/' . urlencode($encrypted)
         // );
 
-        return redirect()->away(
-            'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit?token=' . urlencode($encrypted)
+
+        //(ini sudah hampir benar namun visit salse harus mendecrypt ulang)
+        // return redirect()->away(
+        //     'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit?token=' . urlencode($encrypted)
+        // );
+
+        $redirectUrl = session('redirect_url');
+
+        if (!$redirectUrl) {
+            return redirect('/')->with('error', 'Redirect URL tidak ditemukan.');
+        }
+
+        // 🔥 ganti domain survey → ess
+        $redirectUrl = str_replace(
+            'survey.edpapp.com:2096',
+            'esstesting.edpapp.com:2096',
+            $redirectUrl
         );
+
+        return redirect()->away($redirectUrl);
 
         // return redirect('/dummy-finish?token=' . urlencode($encrypted));
 
