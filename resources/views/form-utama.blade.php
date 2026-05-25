@@ -72,11 +72,17 @@
                                         <input type="text" class="form-control" name="nama_respondent"
                                             value="{{ $sessionData['nama_respondent'] ?? '' }}" required>
                                     </div>
-
+                                    {{--
                                     <div class="form-group">
                                         <label>Nama Toko</label>
                                         <input type="text" class="form-control" name="nama_toko_respondent"
-                                            value="{{ $sessionData['nama_toko_respondent'] ?? '' }}" required>
+                                            value="{{ $sessionData['nama_toko_respondent'] ?? '' }}" readonly>
+                                    </div> --}}
+
+                                    <div class="form-group">
+                                        <label>Nama Toko</label>
+                                        <input type="text" name="nama_toko_respondent"
+                                            value="{{ $outlet->sps_internal_name }}" readonly>
                                     </div>
 
                                     <div class="form-group" style="margin-top: 20px;">
