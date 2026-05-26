@@ -79,10 +79,12 @@
                                             value="{{ $sessionData['nama_toko_respondent'] ?? '' }}" readonly>
                                     </div> --}}
 
-                                    <div class="form-group">
+                                    <div class="form-group" style="margin-top: 20px;">
                                         <label>Nama Toko</label>
-                                        <input type="text" name="nama_toko_respondent"
+                                        <input type="text" class="form-control"
                                             value="{{ $outlet->sps_internal_name }}" readonly>
+                                        <input type="hidden"
+                                            name="nama_toko_respondent"value="{{ $outlet->id }}">
                                     </div>
 
                                     <div class="form-group" style="margin-top: 20px;">
