@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('master_outlet_survey', function (Blueprint $table) {
-            // hanya tambahkan foreign key, jangan buat kolom lagi
-            $table->foreign('master_kabupaten_id')
-                ->references('id')
-                ->on('master_kabupaten')
-                ->nullOnDelete()
-                ->cascadeOnUpdate();
-        });
+        try {
+            Schema::table('master_outlet_survey', function (Blueprint $table) {
+                $table->foreign('master_kabupaten_id')
+                    ->references('id')
+                    ->on('master_kabupaten')
+                    ->nullOnDelete()
+                    ->cascadeOnUpdate();
+            });
+        } catch (\Exception $e) {
+            // Diamkan saja (Blank), artinya jika gagal karena sudah ada relasinya, lewati dengan aman!
+        }
     }
 
     /**
@@ -26,8 +29,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('master_outlet_survey', function (Blueprint $table) {
-            $table->dropForeign(['master_kabupaten_id']);
-        });
+        try {
+            Schema::table('master_outlet_survey', function (Blueprint $table) {
+                $table->dropForeign(['master_kabupaten_id']);
+            });
+        } catch (\Exception $e) {
+            // Diamkan juga saat rollback jika relasi memang sudah tidak ada
+        }
     }
 };

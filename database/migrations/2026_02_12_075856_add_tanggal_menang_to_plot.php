@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('plot_hadiah_survey', function (Blueprint $table) {
-            $table->date('tanggal_menang')->nullable()->after('status_respondent_assigned');
+            // Sederhana: Hanya tambah kolom jika 'tanggal_menang' BELUM ada
+            if (!Schema::hasColumn('plot_hadiah_survey', 'tanggal_menang')) {
+                $table->date('tanggal_menang')->nullable()->after('status_respondent_assigned');
+            }
         });
     }
 
@@ -22,7 +25,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('plot_hadiah_survey', function (Blueprint $table) {
-            $table->dropColumn('tanggal_menang');
+            // Hanya hapus kolom jika memang terdeteksi ada
+            if (Schema::hasColumn('plot_hadiah_survey', 'tanggal_menang')) {
+                $table->dropColumn('tanggal_menang');
+            }
         });
     }
 };

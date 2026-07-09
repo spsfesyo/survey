@@ -11,11 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('master_respondent', function (Blueprint $table) {
+        // Blok 1: Coba hapus unique email secara mandiri
+        try {
+            Schema::table('master_respondent', function (Blueprint $table) {
+                $table->dropUnique(['email_respondent']);
+            });
+        } catch (\Exception $e) {
+            // Diamkan jika index email sudah tidak ada
+        }
 
-            $table->dropUnique(['email_respondent']);
-            $table->dropUnique(['telepone_respondent']);
-        });
+        // Blok 2: Coba hapus unique telepon secara mandiri
+        try {
+            Schema::table('master_respondent', function (Blueprint $table) {
+                $table->dropUnique(['telepone_respondent']);
+            });
+        } catch (\Exception $e) {
+            // Diamkan jika index telepon sudah tidak ada
+        }
     }
 
     /**
@@ -23,10 +35,18 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('master_respondent', function (Blueprint $table) {
+        try {
+            Schema::table('master_respondent', function (Blueprint $table) {
+                $table->unique('email_respondent');
+            });
+        } catch (\Exception $e) {
+        }
 
-            $table->unique('email_respondent');
-            $table->unique('telepone_respondent');
-        });
+        try {
+            Schema::table('master_respondent', function (Blueprint $table) {
+                $table->unique('telepone_respondent');
+            });
+        } catch (\Exception $e) {
+        }
     }
 };

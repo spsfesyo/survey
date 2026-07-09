@@ -106,7 +106,7 @@ Route::get('/get-kabupaten/{provinsi_id}', [RespondentController::class, 'getKab
 // Route::get('/check-phone-duplicate', [RespondentController::class, 'checkDuplicatePhone'])->name('check-duplicate-phone');
 
 
-
+Route::get('/form-survey-tim-project', [RespondentController::class, 'getFormProject'])->name('form-survey-tim-project');
 
 // Route::get('/form-utama',function () {
 //     return view('form-utama');

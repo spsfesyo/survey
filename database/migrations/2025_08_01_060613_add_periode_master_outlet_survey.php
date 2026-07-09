@@ -13,9 +13,10 @@ return new class extends Migration
     {
 
         Schema::table('master_outlet_survey', function (Blueprint $table) {
-            $table->string('periode', 7)->after('status_kode_unik')->nullable();
-
-
+            // Sederhana: Hanya tambah kolom jika kolom 'periode' BELUM ada
+            if (!Schema::hasColumn('master_outlet_survey', 'periode')) {
+                $table->string('periode', 7)->after('status_kode_unik')->nullable();
+            }
         });
     }
 
@@ -24,6 +25,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('master_outlet_survey');
+        Schema::table('master_outlet_survey', function (Blueprint $table) {
+            // AMAN: Hanya hapus kolom 'periode'-nya saja, bukan hapus satu tabel!
+            if (Schema::hasColumn('master_outlet_survey', 'periode')) {
+                $table->dropColumn('periode');
+            }
+        });
     }
 };

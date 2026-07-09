@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('master_respondent', function (Blueprint $table) {
-            $table->boolean('is_gimmick')->nullable()->after('periode_id');
+            // Sederhana: Hanya tambah kolom jika 'is_gimmick' BELUM ada
+            if (!Schema::hasColumn('master_respondent', 'is_gimmick')) {
+                $table->boolean('is_gimmick')->nullable()->after('periode_id');
+            }
         });
     }
 
@@ -22,7 +25,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('master_respondent', function (Blueprint $table) {
-            $table->dropColumn('is_gimmick');
+            // Hanya hapus kolom jika memang ada
+            if (Schema::hasColumn('master_respondent', 'is_gimmick')) {
+                $table->dropColumn('is_gimmick');
+            }
         });
     }
 };

@@ -11,11 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('master_section', function (Blueprint $table) {
-            $table->id()->index()->autoIncrement(); // kolom id (auto increment)
-            $table->string('nama_section'); // kolom section_name
-            $table->timestamps(); // created_at & updated_at
-        });
+        if (!Schema::hasTable('master_section')) {
+            Schema::create('master_section', function (Blueprint $table) {
+
+                $table->id()->index()->autoIncrement(); // kolom id (auto increment)
+                $table->string('nama_section'); // kolom section_name
+                $table->timestamps(); // created_at & updated_at
+            });
+        }
     }
 
     /**

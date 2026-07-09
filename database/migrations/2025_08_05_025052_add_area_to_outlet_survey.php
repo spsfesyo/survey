@@ -11,17 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('master_outlet_survey', function (Blueprint $table) {
-            $table->foreignId('master_area_id')
-                  ->nullable()
-                  ->constrained('master_area')
-                  ->nullOnDelete()
-                  ->after('master_kabupaten_id');
+        if (!Schema::hasColumn('master_outlet_survey', 'master_area_id')) {
+            Schema::table('master_outlet_survey', function (Blueprint $table) {
+                $table->foreignId('master_area_id')
+                    ->nullable()
+                    ->constrained('master_area')
+                    ->nullOnDelete()
+                    ->after('master_kabupaten_id');
 
-                  $table->enum('status_blast_wa', ['true', 'false'])
-                        ->default('false')
-                        ->after('periode');
-        });
+                $table->enum('status_blast_wa', ['true', 'false'])
+                    ->default('false')
+                    ->after('periode');
+            });
+        }
     }
 
     /**

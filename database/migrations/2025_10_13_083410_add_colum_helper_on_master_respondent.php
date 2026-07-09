@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('master_respondent', function (Blueprint $table) {
-            // Tambahkan kolom periode_old setelah periode_id lama
-            $table->string('periode_old')->nullable()->after('periode_id');
-        });
+        if (!Schema::hasColumn('master_respondent', 'periode_old')) {
+            Schema::table('master_respondent', function (Blueprint $table) {
+                // Tambahkan kolom periode_old setelah periode_id lama
+                $table->string('periode_old')->nullable()->after('periode_id');
+            });
+        }
     }
 
     /**
@@ -24,7 +26,9 @@ return new class extends Migration
     {
         Schema::table('master_respondent', function (Blueprint $table) {
             // Hapus kolom periode_old jika rollback
-            $table->dropColumn('periode_old');
+            if (Schema::hasColumn('master_respondent', 'periode_old')) {
+                $table->dropColumn('periode_old');
+            }
         });
     }
 };

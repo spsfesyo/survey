@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('checks', function (Blueprint $table) {
-            $table->enum('status_blast_wa', ['true', 'false'])->default('false');
-        });
+        if (!Schema::hasColumn('checks', 'status_blast_wa')) {
+            Schema::table('checks', function (Blueprint $table) {
+                $table->enum('status_blast_wa', ['true', 'false'])->default('false');
+            });
+        }
     }
 
     /**

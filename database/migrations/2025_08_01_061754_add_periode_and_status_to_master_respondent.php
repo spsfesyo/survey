@@ -13,13 +13,18 @@ return new class extends Migration
     {
 
         Schema::table('master_respondent', function (Blueprint $table) {
-            $table->string('periode_id', 7)->after('hadiah_id')->nullable(); // untuk menyimpan '2024-08', dll
+            if (!Schema::hasColumn('master_respondent', 'periode_id')) {
+                $table->string('periode_id', 7)->after('hadiah_id')->nullable();
+            }
+        });
 
-            $table->enum('status_hadiah', ['ACTIVE', 'INACTIVE'])->after('periode_id')
-                ->nullable()
-                ->default(null);
-
-          
+        // Blok 2: Tambah status_hadiah jika belum ada
+        Schema::table('master_respondent', function (Blueprint $table) {
+            if (!Schema::hasColumn('master_respondent', 'status_hadiah')) {
+                $table->enum('status_hadiah', ['ACTIVE', 'INACTIVE'])->after('periode_id')
+                    ->nullable()
+                    ->default(null);
+            }
         });
     }
 
@@ -28,6 +33,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('master_respondent');
+        Schema::table('master_respondent', function (Blueprint $table) {
+            // AMAN: Hanya hapus kolom yang kita tambahkan saja, bukan hapus seluruh tabel!
+            if (Schema::hasColumn('master_respondent', 'status_hadiah')) {
+                $table->dropColumn('status_hadiah');
+            }
+
+            if (Schema::hasColumn('master_respondent', 'periode_id')) {
+                $table->dropColumn('periode_id');
+            }
+        });
     }
 };

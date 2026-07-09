@@ -13,6 +13,9 @@ class MasterRespondent extends Model
     protected $fillable = [
         'periode_survey_id',
         'master_outlet_survey_id',
+        'nama_customer_project',
+        'nama_toko_project',
+        'alamat_toko_project',
         'nama_respondent',
         'email_respondent',
         'telepone_respondent',

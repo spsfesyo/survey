@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('master_respondent', function (Blueprint $table) {
-            $table->string('foto_selfie')->nullable()->after('alamat_toko_respondent');
-        });
+        if (!Schema::hasColumn('master_respondent', 'foto_selfie')) {
+            Schema::table('master_respondent', function (Blueprint $table) {
+                $table->string('foto_selfie')->nullable()->after('alamat_toko_respondent');
+            });
+        }
     }
 
     /**
@@ -22,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('master_respondent', function (Blueprint $table) {
-              $table->dropColumn('foto_selfie');
+            $table->dropColumn('foto_selfie');
         });
     }
 };

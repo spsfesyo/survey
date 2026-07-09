@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasColumn('master_kabupaten', 'master_area_id')) {
         Schema::table('master_kabupaten', function (Blueprint $table) {
             $table->foreignId('master_area_id')
                   ->nullable()
@@ -18,6 +19,7 @@ return new class extends Migration
                   ->nullOnDelete()
                   ->after('provinsi_id');
         });
+        }
     }
 
     /**

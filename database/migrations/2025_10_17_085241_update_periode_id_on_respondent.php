@@ -11,20 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Blok 1: Ubah tipe data kolom jika kolomnya ada
         Schema::table('master_respondent', function (Blueprint $table) {
-            // Pastikan kolomnya memang sudah ada
             if (Schema::hasColumn('master_respondent', 'periode_id')) {
                 // Ubah tipe kolom dari varchar ke unsignedBigInteger
                 $table->unsignedBigInteger('periode_id')->nullable()->change();
-
-                // Tambahkan relasi foreign key
-                $table->foreign('periode_id')
-                    ->references('id')
-                    ->on('master_periode_survey')
-                    ->onUpdate('cascade')
-                    ->onDelete('set null');
             }
         });
+
+        // Blok 2: Pasang foreign key menggunakan try-catch terpisah
+        // Jika relasinya ternyata sudah nempel di server, database akan skip tanpa memicu error
+        try {
+            Schema::table('master_respondent', function (Blueprint $table) {
+                if (Schema::hasColumn('master_respondent', 'periode_id')) {
+                    $table->foreign('periode_id')
+                        ->references('id')
+                        ->on('master_periode_survey')
+                        ->onUpdate('cascade')
+                        ->onDelete('set null');
+                }
+            });
+        } catch (\Exception $e) {
+            // Diamkan saja (Blank), artinya jika gagal karena relasinya sudah ada, lewati dengan aman!
+        }
     }
 
     /**
@@ -33,11 +42,17 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('master_respondent', function (Blueprint $table) {
-            // Hapus foreign key dulu
-            $table->dropForeign(['periode_id']);
+            try {
+                // Hapus foreign key dulu jika ada
+                $table->dropForeign(['periode_id']);
+            } catch (\Exception $e) {
+            }
 
-            // Ubah balik ke varchar jika rollback
-            $table->string('periode_id')->nullable()->change();
+            try {
+                // Ubah balik ke varchar jika rollback
+                $table->string('periode_id')->nullable()->change();
+            } catch (\Exception $e) {
+            }
         });
     }
 };

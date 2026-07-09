@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('master_hadiah_survey')) {
           Schema::create('master_hadiah_survey', function (Blueprint $table) {
             $table->id();
             $table->string('kode_hadiah')->nullable();
@@ -19,6 +20,7 @@ return new class extends Migration
             $table->enum('status', ['Y', 'N'])->default('Y');
             $table->timestamps(); // created_at & updated_at
         });
+        }
     }
 
     /**

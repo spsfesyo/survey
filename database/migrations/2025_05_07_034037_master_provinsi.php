@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('master_provinsi', function (Blueprint $table) {
-            $table->id()->index()->autoIncrement(); // kolom id (auto increment)
-            $table->string('nama_provinsi'); // kolom nama_provinsi
-            $table->timestamps(); // created_at & updated_at
-        });
+        if (!Schema::hasTable('master_provinsi')) {
+            Schema::create('master_provinsi', function (Blueprint $table) {
+                $table->id()->index()->autoIncrement(); // kolom id (auto increment)
+                $table->string('nama_provinsi'); // kolom nama_provinsi
+                $table->timestamps(); // created_at & updated_at
+            });
+        }
     }
 
     /**

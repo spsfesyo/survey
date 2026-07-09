@@ -67,49 +67,89 @@
                                 <form id="formSurvey" method="POST" action="{{ route('post-form-utama') }}">
                                     @csrf
 
-                                    <div class="form-group">
-                                        <label>Nama Customer</label>
-                                        <input type="text" class="form-control" name="nama_respondent"
-                                            value="{{ $sessionData['nama_respondent'] ?? '' }}" required>
-                                    </div>
-                                    {{--
-                                    <div class="form-group">
-                                        <label>Nama Toko</label>
-                                        <input type="text" class="form-control" name="nama_toko_respondent"
-                                            value="{{ $sessionData['nama_toko_respondent'] ?? '' }}" readonly>
-                                    </div> --}}
 
-                                    <div class="form-group" style="margin-top: 20px;">
-                                        <label>Nama Toko</label>
-                                        <input type="text" class="form-control"
-                                            value="{{ $outlet->sps_internal_name }}" readonly>
-                                        <input type="hidden"
-                                            name="nama_toko_respondent"value="{{ $outlet->id }}">
-                                    </div>
 
-                                    <div class="form-group" style="margin-top: 20px;">
-                                        <label>Provinsi Lokasi Toko</label>
+                                    @if ($outlet)
+                                        <div class="form-group">
+                                            <label>Nama Customer</label>
+                                            <input type="text" class="form-control" name="nama_respondent"
+                                                value="{{ $sessionData['nama_respondent'] ?? '' }}" required>
+                                        </div>
+                                        <div class="form-group" style="margin-top: 20px;">
+                                            <label>Nama Toko</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $outlet->sps_internal_name }}" readonly>
+                                            <input type="hidden" name="nama_toko_respondent"
+                                                value="{{ $outlet->id }}">
+                                        </div>
 
-                                        <input type="text" class="form-control"
-                                            value="{{ $selectedProvinsi->nama_provinsi }}" readonly>
+                                        <div class="form-group" style="margin-top: 20px;">
+                                            <label>Provinsi Lokasi Toko</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $selectedProvinsi->nama_provinsi ?? '' }}" readonly>
+                                            <input type="hidden" name="provinsi"
+                                                value="{{ $selectedProvinsi->id ?? '' }}">
+                                        </div>
 
-                                        <input type="hidden" name="provinsi" value="{{ $selectedProvinsi->id }}">
-                                    </div>
+                                        <div class="form-group" style="margin-top: 20px;">
+                                            <label>Kabupaten/Kota Lokasi Toko</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $selectedKabupaten->nama_kabupaten ?? '' }}" readonly>
+                                            <input type="hidden" name="kabupaten"
+                                                value="{{ $selectedKabupaten->id ?? '' }}">
+                                        </div>
 
-                                    <div class="form-group" style="margin-top: 20px;">
-                                        <label>Kabupaten/Kota Lokasi Toko</label>
 
-                                        <input type="text" class="form-control"
-                                            value="{{ $selectedKabupaten->nama_kabupaten }}" readonly>
+                                        <div class="form-group">
+                                            <label>Alamat Toko</label>
+                                            <input type="text" class="form-control" name="alamat_toko_respondent"
+                                                value="{{ $sessionData['alamat_toko_respondent'] ?? '' }}" required>
+                                        </div>
+                                    @else
+                                        <div class="form-group">
+                                            <label>Nama Customer Project</label>
+                                            <input type="text" class="form-control" name="nama_customer_project"
+                                                value="{{ $sessionData['nama_customer_project'] ?? '' }}" required>
+                                        </div>
+                                        <div class="form-group" style="margin-top: 20px;">
+                                            <label>Nama Project</label>
+                                            <input type="text" class="form-control" name="nama_toko_project"
+                                                value="{{ $sessionData['nama_toko_project'] ?? '' }}" required
+                                                placeholder="Masukkan Nama Project">
+                                        </div>
 
-                                        <input type="hidden" name="kabupaten" value="{{ $selectedKabupaten->id }}">
-                                    </div>
+                                        <div class="form-group" style="margin-top: 20px;">
+                                            <label for="provinsi">Provinsi Lokasi Project</label>
+                                            <select class="form-control select2" id="provinsi_select" name="provinsi"
+                                                required style="width: 100%;">
+                                                <option value="">-- Pilih Provinsi --</option>
+                                                @if (isset($provinsis))
+                                                    @foreach ($provinsis as $prov)
+                                                        <option value="{{ $prov->id }}"
+                                                            {{ isset($sessionData['provinsi']) && $sessionData['provinsi'] == $prov->id ? 'selected' : '' }}>
+                                                            {{ $prov->nama_provinsi }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label>Alamat Toko</label>
-                                        <input type="text" class="form-control" name="alamat_toko_respondent"
-                                            value="{{ $sessionData['alamat_toko_respondent'] ?? '' }}" required>
-                                    </div>
+                                        <div class="form-group" style="margin-top: 20px;">
+                                            <label for="kabupaten">Kabupaten/Kota Lokasi Project</label>
+                                            <select class="form-control select2" id="kabupaten_select" name="kabupaten"
+                                                required style="width: 100%;">
+                                                <option value="">-- Pilih Kabupaten --</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Alamat Project</label>
+                                            <input type="text" class="form-control" name="alamat_toko_project"
+                                                value="{{ $sessionData['alamat_toko_project'] ?? '' }}" required
+                                                placeholder="Masukkan Alamat Project">
+                                        </div>
+
+                                    @endif
 
                                     <div class="form-group">
                                         <label>Nomor Telepon / WhatsApp</label>
@@ -296,33 +336,70 @@
 
     <!-- Custom Scripts -->
     <script>
-        $('#provinsi').on('change', function() {
-            let provinsiId = $(this).val();
-            $('#kabupaten').html('<option>Loading...</option>');
+        $(document).ready(function() {
+            // Ambil data kabupaten lama dari session Laravel yang dicetak ke JavaScript
+            let oldKabupaten = "{{ $sessionData['kabupaten'] ?? '' }}";
 
-            if (provinsiId) {
-                $.ajax({
-                    url: '/get-kabupaten/' + provinsiId,
-                    type: 'GET',
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            $('#kabupaten').empty().append(
+            // Jalankan AJAX ketika pilihan Provinsi berubah
+            $('#provinsi_select').on('change', function() {
+                let provinsiId = $(this).val();
+
+                // Tampilkan status loading sementara pada dropdown kabupaten
+                $('#kabupaten_select').html('<option value="">Loading...</option>');
+
+                if (provinsiId) {
+                    $.ajax({
+                        url: '/get-kabupaten/' + provinsiId,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            // Kosongkan opsi lama dan beri opsi default awal
+                            $('#kabupaten_select').empty().append(
                                 '<option value="">-- Pilih Kabupaten --</option>');
-                            $.each(response.data, function(i, kab) {
-                                $('#kabupaten').append(
-                                    `<option value="${kab.id}">${kab.nama_kabupaten}</option>`
-                                );
-                            });
-                        } else {
-                            alert('Gagal mengambil data kabupaten');
+
+                            // Pastikan response sukses dan data tersedia
+                            if (response.status === 'success' && response.data) {
+                                // Looping data kabupaten dari backend
+                                $.each(response.data, function(i, kab) {
+                                    // Cek apakah ID kabupaten ini sama dengan yang ada di session lama
+                                    let isSelected = (kab.id == oldKabupaten) ?
+                                        'selected' : '';
+
+                                    $('#kabupaten_select').append(
+                                        `<option value="${kab.id}" ${isSelected}>${kab.nama_kabupaten}</option>`
+                                    );
+                                });
+                            } else {
+                                alert(
+                                    'Gagal mengambil data atau data kabupaten tidak ditemukan.');
+                            }
+
+                            // Jika menggunakan Select2, segarkan (refresh) tampilannya
+                            if ($('#kabupaten_select').hasClass('select2')) {
+                                $('#kabupaten_select').trigger('change');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error AJAX:", error);
+                            alert('Terjadi kesalahan saat menghubungi server.');
+                            $('#kabupaten_select').html(
+                                '<option value="">-- Pilih Kabupaten --</option>');
                         }
-                    },
-                    error: function() {
-                        alert('Terjadi kesalahan saat mengambil data kabupaten.');
+                    });
+                } else {
+                    // Jika pilihan provinsi dikosongkan kembali
+                    $('#kabupaten_select').html('<option value="">-- Pilih Kabupaten --</option>');
+                    if ($('#kabupaten_select').hasClass('select2')) {
+                        $('#kabupaten_select').trigger('change');
                     }
-                });
-            } else {
-                $('#kabupaten').html('<option value="">-- Pilih Kabupaten --</option>');
+                }
+            });
+
+            // 🌟 LOGIKA UTAMA FIX BACK BUTTON:
+            // Jika saat halaman diload/di-back ternyata nilai Provinsi sudah terisi oleh session Laravel,
+            // Picu (trigger) event change secara otomatis untuk mendownload kabupatennya
+            if ($('#provinsi_select').val()) {
+                $('#provinsi_select').trigger('change');
             }
         });
         // Checkbox limit functionality
@@ -411,7 +488,7 @@
         });
     </script>
 
-    @if (session('phone_duplicate'))
+    {{-- @if (session('phone_duplicate'))
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
             Swal.fire({
@@ -421,7 +498,7 @@
                 confirmButtonText: 'OK'
             });
         </script>
-    @endif
+    @endif --}}
 
 
 

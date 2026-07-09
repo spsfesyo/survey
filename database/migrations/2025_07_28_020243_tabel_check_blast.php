@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('checks', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_check');
-            $table->string('no_telp_check');
-            $table->char('kode_unik', 10);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('checks')) {
+            Schema::create('checks', function (Blueprint $table) {
+                $table->id();
+                $table->string('nama_check');
+                $table->string('no_telp_check');
+                $table->char('kode_unik', 10);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-         Schema::dropIfExists('checks');
+        Schema::dropIfExists('checks');
     }
 };

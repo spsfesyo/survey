@@ -156,55 +156,68 @@ class RespondentController extends Controller
 
     public function getFormUtama()
     {
-        //old
 
-        // // Cek apakah email sudah terdaftar
-        // // Ambil data provinsi dan kota
 
-        // $provinsi = MasterProvinsi::all();
-        // // $kota = MasterKotaSurvey::all();
-        // $pertanyaanFormUtama = MasterPertanyaan::with(['tipePertanyaan', 'options'])
+        // $outletId = session('master_outlet_survey_id');
+
+        // $outlet = MasterOutletSurvey::find($outletId);
+
+        // if (!$outlet) {
+        //     return redirect()->route('home');
+        // }
+
+
+        // $selectedKabupaten = MasterKabupaten::find($outlet->master_kabupaten_id);
+
+        // $selectedProvinsi = $selectedKabupaten
+        //     ? MasterProvinsi::find($selectedKabupaten->provinsi_id)
+        //     : null;
+
+        // $pertanyaanFormUtama = MasterPertanyaan::with([
+        //     'tipePertanyaan',
+        //     'options'
+        // ])
         //     ->where('master_section_id', 1)
         //     ->orderBy('order')
         //     ->get();
 
         // $merekBataRingan = MasterJenisPertanyaan::all();
-        // // $pertanyaans = MasterPertanyaan::with('options')->where('master_section_id',1)->orderBy('order')->get();
+
+        // return view('form-utama', compact(
+        //     'outlet',
+        //     'selectedKabupaten',
+        //     'selectedProvinsi',
+        //     'pertanyaanFormUtama',
+        //     'merekBataRingan'
+        // ));
 
 
-        // // dd($pertanyaans);
-        // // return view('form_utama', compact('pertanyaanFormUtama'));
-
-        // return view('form-utama', compact('provinsi',  'pertanyaanFormUtama', 'merekBataRingan'));
-
+        // Ambil ID Outlet dari session (jika ada, biasanya dari /visit-entry/{token})
         $outletId = session('master_outlet_survey_id');
+        $outlet = null;
+        $selectedKabupaten = null;
+        $selectedProvinsi = null;
+        $provinsis = null; // Untuk alur umum/inputan select
 
-        $outlet = MasterOutletSurvey::find($outletId);
-
-        if (!$outlet) {
-            return redirect()->route('home');
+        if ($outletId) {
+            // --- ALUR A: JIKA MASUK LEWAT VISIT SALES (READONLY) ---
+            $outlet = MasterOutletSurvey::find($outletId);
+            if ($outlet) {
+                $selectedKabupaten = MasterKabupaten::find($outlet->master_kabupaten_id);
+                $selectedProvinsi = $selectedKabupaten
+                    ? MasterProvinsi::find($selectedKabupaten->provinsi_id)
+                    : null;
+            }
         }
 
-        // $selectedKabupaten = MasterKabupaten::find(
-        //     $outlet->master_kabupaten_id
-        // );
+        // --- ALUR B: JIKA TIDAK ADA OUTLET DI SESSION (INPUTAN/SELECT) ---
+        if (!$outlet) {
+            // Ambil data master semua provinsi untuk dropdown select
+            $provinsis = MasterProvinsi::all();
+        }
 
-
-
-        // $selectedProvinsi = MasterProvinsi::find(
-        //     $selectedKabupaten->provinsi_id
-        // );
-
-        $selectedKabupaten = MasterKabupaten::find($outlet->master_kabupaten_id);
-
-        $selectedProvinsi = $selectedKabupaten
-            ? MasterProvinsi::find($selectedKabupaten->provinsi_id)
-            : null;
-
-        $pertanyaanFormUtama = MasterPertanyaan::with([
-            'tipePertanyaan',
-            'options'
-        ])
+        // Data Pertanyaan dan Merek tetap di-load untuk kedua alur
+        $pertanyaanFormUtama = MasterPertanyaan::with(['tipePertanyaan', 'options'])
             ->where('master_section_id', 1)
             ->orderBy('order')
             ->get();
@@ -215,6 +228,7 @@ class RespondentController extends Controller
             'outlet',
             'selectedKabupaten',
             'selectedProvinsi',
+            'provinsis', // Variabel baru untuk menampung semua list provinsi
             'pertanyaanFormUtama',
             'merekBataRingan'
         ));
@@ -229,6 +243,13 @@ class RespondentController extends Controller
             // validasi lainnya jika perlu
         ]);
 
+        if (!$request->has('master_outlet_survey_id') || empty($request->input('master_outlet_survey_id'))) {
+            $rules['nama_toko_project'] = 'required|string|max:255';
+            $rules['provinsi']          = 'required|integer';
+            $rules['kabupaten']         = 'required|integer';
+            $rules['alamat_toko_project'] = 'required|string';
+        }
+
         // $telp = $request->input('telepone_respondent');
 
         // // Cek duplikasi nomor di database
@@ -242,6 +263,34 @@ class RespondentController extends Controller
         session(['form_utama' => $request->all()]);
 
         return redirect()->route('form-pertanyaan-kualitas');
+    }
+
+
+    public function getFormProject()
+    {
+        // Alur Project Tim biasanya bersifat umum/bebas isi, mirip Alur B
+        // Kita panggil semua list provinsi agar user bisa milih lokasi project-nya
+        $provinsis = MasterProvinsi::all();
+        $outlet = null;
+        $selectedKabupaten = null;
+        $selectedProvinsi = null;
+
+        $pertanyaanFormUtama = MasterPertanyaan::with(['tipePertanyaan', 'options'])
+            ->where('master_section_id', 1) // Sesuaikan id section jika form project pertanyaannya berbeda
+            ->orderBy('order')
+            ->get();
+
+        $merekBataRingan = MasterJenisPertanyaan::all();
+
+        // Re-use (gunakan kembali) blade 'form-utama' agar tidak double coding layout
+        return view('form-utama', compact(
+            'outlet',
+            'selectedKabupaten',
+            'selectedProvinsi',
+            'provinsis',
+            'pertanyaanFormUtama',
+            'merekBataRingan'
+        ));
     }
 
 
@@ -563,61 +612,327 @@ class RespondentController extends Controller
     //     return redirect()->route('home')->with('success', 'Terima kasih atas partisipasi Anda!, Maaf anda belum beruntung memenangkan hadiah menarik dari kami.');
     // }
 
-    public function submitFinalAnswer(Request $request)
-    {
+    // public function submitFinalAnswer(Request $request)
+    // {
 
-        // dd('kambing');
-        /* =======================
+    // dd('kambing');
+    /* =======================
      * 1️⃣ CEK DUPLIKAT PHONE
      * ======================= */
-        // $formUtama = session('form_utama', []);
-        // $phone = $formUtama['telepone_respondent'] ?? null;
+    // $formUtama = session('form_utama', []);
+    // $phone = $formUtama['telepone_respondent'] ?? null;
 
-        // if ($phone && MasterRespondent::where('telepone_respondent', $phone)->exists()) {
-        //     return redirect()
-        //         ->route('form-pertanyaan-pelayanan')
-        //         ->with('phone_duplicate', $phone)
-        //         ->withInput();
-        // }
+    // if ($phone && MasterRespondent::where('telepone_respondent', $phone)->exists()) {
+    //     return redirect()
+    //         ->route('form-pertanyaan-pelayanan')
+    //         ->with('phone_duplicate', $phone)
+    //         ->withInput();
+    // }
 
-        /* =======================
+    /* =======================
      * 2️⃣ SIMPAN SESSION FORM TERAKHIR
      * ======================= */
-        // session(['form_gimmick' => $request->all()]);
+    // session(['form_gimmick' => $request->all()]);
+    // (1)
+    // $formUtama      = session('form_utama', []);
+    // $formKualitas   = session('form_kualitas', []);
+    // $formHarga      = session('form_harga', []);
+    // $formPengiriman = session('form_pengiriman', []);
+    // $formPelayanan  = session('form_pelayanan', []);
+    // $formGimmick    = session('form_gimmick', []);
 
+    // $outletId = session('master_outlet_survey_id');
+    // $kodeUnik = session('kode_unik');
+
+    // if (!$outletId || !$kodeUnik || empty($formUtama)) {
+    //     // return redirect()->route('home')->with('error', 'Sesi tidak lengkap. Silakan ulangi.');
+    //      return redirect('/')->with('error', 'Sesi tidak lengkap. Silakan ulangi.');
+
+    // }
+
+    // if (!$outletId) {
+    //     return redirect('/')->with('error', 'Outlet tidak ditemukan. Ulangi dari awal.');
+    // }
+
+    // if (empty($formUtama)) {
+    //     return redirect()->route('form-utama')
+    //         ->with('error', 'Silakan isi form utama terlebih dahulu.');
+    // }
+
+    // (2)
+    // if (!$outletId || empty($formUtama)) {
+    //     return redirect('/')
+    //         ->with('error', 'Sesi tidak lengkap. Silakan ulangi dari awal.');
+    // }
+
+    /* =======================
+     * 3️⃣ PROSES FOTO
+     * ======================= */
+    // (3)
+    // $fotoPath = null;
+    // if ($request->filled('foto_base64')) {
+    //     try {
+    //         $base64 = preg_replace('#^data:image/\w+;base64,#i', '', $request->foto_base64);
+    //         $data = base64_decode($base64);
+    //         $fileName = 'foto-respondent/' . Str::uuid() . '.jpg';
+    //         Storage::disk('public')->put($fileName, $data);
+    //         $fotoPath = 'storage/' . $fileName;
+    //     } catch (\Throwable $e) {
+    //         logger('Foto gagal disimpan: ' . $e->getMessage());
+    //     }
+    // }
+
+    /* =======================
+     * 4️⃣ SIMPAN RESPONDENT (SELALU)
+     * ======================= */
+    // (4)
+    // $provId = $formUtama['provinsi'] ?? null;
+    // $kabId  = $formUtama['kabupaten'] ?? null;
+
+    // $outletSurvey = MasterOutletSurvey::find($outletId);
+
+
+
+    // bagian ini sama seperti bawahnya hanya saja untuk lebih advance mengecek periode aktif
+    // $periodeAktif = MasterPeriode::whereDate('tanggal_mulai', '<=', now())
+    //     ->whereDate('tanggal_selesai', '>=', now())
+    //     ->first();
+
+
+    // untuk cek mencari periode yang aktif
+    // (5)
+    // $periodeAktif = MasterPeriode::where('status', 'aktif')->first();
+
+    // if (!$periodeAktif) {
+    //     return redirect()->route('home')
+    //         ->with('error', 'Periode tidak aktif.');
+    // }
+
+    // $periodeId = $periodeAktif->id;
+
+    // $respondent = MasterRespondent::create([
+    //     'master_outlet_survey_id'  => $outletId,
+    //     'master_kabupaten_id'      => $kabId,
+    //     'periode_id'               => $periodeId,
+    //     // 'telepone_respondent'      => $phone,
+    //     'telepone_respondent'      => $formUtama['telepone_respondent'] ?? null,
+    //     'provinsi_id'              => $provId,
+    //     'jenis_pertanyaan_id'      => $formUtama['jenis_pertanyaan_id'] ?? null,
+    //     'nama_respondent'          => $formUtama['nama_respondent'] ?? null,
+    //     'nama_toko_respondent'     => $formUtama['nama_toko_respondent'] ?? null,
+    //     'alamat_toko_respondent'   => $formUtama['alamat_toko_respondent'] ?? null,
+    //     'foto_selfie'              => $fotoPath,
+    //     'is_gimmick'               => $formGimmick['is_gimmick'] ?? null,
+    // ]);
+
+    /* =======================
+     * 5️⃣ CEK KE TABEL PLOT (LOGIC MENANG)
+     * ======================= */
+
+    // $hadiahNama = null;
+
+    // if ($kabId && $provId && $periodeId) {
+
+    //     $plot = PlotHadiahSurvey::where('master_outlet_survey_id', $outletId)
+    //         ->where('master_kabupaten_id', $kabId)
+    //         ->where('provinsi_id', $provId)
+    //         ->where('periode_survey_id', $periodeId)
+    //         ->where('is_winning', 'N')
+    //         ->first();
+
+    //     if ($plot) {
+    //         // 🎉 MENANG
+    //         $plot->update([
+    //             'is_winning'       => 'Y',
+    //             'status_respondent_assigned' => 'Y',
+    //             'respondent_id' => $respondent->id,
+    //             'tanggal_menang'   => now()->toDateString(),
+    //         ]);
+
+    //         $respondent->update([
+    //             'hadiah_id'  => $plot->hadiah_id,
+    //             'is_winner'  => 'Y',
+    //         ]);
+
+    //         $hadiahNama = optional($plot->hadiah)->nama_hadiah;
+    //     }
+    // }
+
+    /* =======================
+     * 6️⃣ SIMPAN JAWABAN
+     * ======================= */
+    // (6)
+    // $respondentId = $respondent->id;
+    // $all = array_filter(array_merge($formUtama, $formKualitas, $formHarga, $formPengiriman, $formPelayanan));
+
+    // foreach ($all as $key => $val) {
+    //     if (!str_starts_with($key, 'pertanyaan_') || str_contains($key, 'other_')) continue;
+    //     $qId = str_replace('pertanyaan_', '', $key);
+
+    //     if (is_array($val)) {
+    //         foreach ($val as $opt) {
+    //             $isOther = str_starts_with($opt, 'other_');
+    //             AnswerSurvey::create([
+    //                 'master_respondent_id'   => $respondentId,
+    //                 'master_pertanyaan_id'   => $qId,
+    //                 'pertanyaan_options_id'  => $isOther ? intval(str_replace('other_', '', $opt)) : intval($opt),
+    //                 'jawaban_teks'           => $isOther ? null : ($all["teks_$qId"] ?? null),
+    //                 'lainnya'                => $isOther ? ($all["pertanyaan_{$qId}_$opt"] ?? null) : null,
+    //             ]);
+    //         }
+    //     } else {
+    //         AnswerSurvey::create([
+    //             'master_respondent_id'   => $respondentId,
+    //             'master_pertanyaan_id'   => $qId,
+    //             'pertanyaan_options_id'  => is_numeric($val) ? intval($val) : null,
+    //             'jawaban_teks'           => is_numeric($val) ? ($all["teks_$qId"] ?? null) : $val,
+    //             'lainnya'                => $all["lainnya_$qId"] ?? null,
+    //         ]);
+    //     }
+    // }
+
+    /* =======================
+     * 7️⃣ UPDATE KODE UNIK OUTLET
+     * ======================= */
+    // (7)
+    // MasterOutletSurvey::where('id', $outletId)
+    //     ->update(['status_kode_unik' => 'N']);
+
+
+
+
+    /* =======================
+     * 8️⃣ CLEAR SESSION
+     * ======================= */
+    // $visitSalesId = session('visit_sales_id');
+    // $spsName = session('sps_name');
+
+    // $encrypted = Crypt::encryptString(
+    //     $visitSalesId . '|' . $spsName
+    // );
+
+    // session()->forget([
+    //     'form_utama',
+    //     'form_kualitas',
+    //     'form_harga',
+    //     'form_pengiriman',
+    //     'form_pelayanan',
+    //     'form_gimmick',
+    //     'master_outlet_survey_id',
+    //     'kode_unik'
+    // ]);
+
+
+    // (8)
+    // $visitSalesId = session('visit_sales_form_id');
+    // $spsName = session('sps_name');
+
+    // if ($visitSalesId) {
+    //     $payload = $visitSalesId . '|' . $spsName;
+    // } else {
+    //     $payload = $spsName;
+    // }
+
+
+    // (9)
+    // session()->forget([
+    //     'form_utama',
+    //     'form_kualitas',
+    //     'form_harga',
+    //     'form_pengiriman',
+    //     'form_pelayanan',
+    //     'form_gimmick',
+    //     'master_outlet_survey_id',
+    //     'kode_unik',
+    // ]);
+
+    /* =======================
+     * 9️⃣ REDIRECT + SWEETALERT
+     * ======================= */
+    //     if ($hadiahNama) {
+    //         return redirect()->route('home')
+    //             ->with('success', "🎉 Selamat! Anda mendapatkan hadiah: $hadiahNama");
+    //     }
+
+    //     return redirect()->route('home')
+    //         ->with('success', 'Terima kasih atas partisipasi Anda! Anda belum beruntung kali ini.');
+    // }
+
+    // return redirect()->away(
+    //     'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit/' . urlencode($encrypted)
+    // );
+
+
+    //(ini sudah hampir benar namun visit salse harus mendecrypt ulang)
+    // return redirect()->away(
+    //     'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit?token=' . urlencode($encrypted)
+    // );
+
+
+    // (10)
+    // $token = session('redirect_token');
+    // $store = session('redirect_store');
+
+    // if (!$token || !$store) {
+    //     return redirect('/')->with('error', 'Token redirect tidak ditemukan.');
+    // }
+
+    // $url = 'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit/'
+    //     . $token
+    //     . '?store=' . urlencode($store);
+
+    // return redirect()->away($url);
+
+
+
+
+
+
+
+
+    // return redirect('/dummy-finish?token=' . urlencode($encrypted));
+
+    // return redirect()->away(
+    //     'http://127.0.0.1:8000/dummy-finish?token=' . urlencode($encrypted)
+    // );
+
+
+    // public function checkDuplicatePhone(Request $request)
+    // {
+    //     $phone = $request->query('phone');
+    //     $exists = MasterRespondent::where('telepone_respondent', $phone)->exists();
+    //     return response()->json(['exists' => $exists]);
+    // }
+    // }
+
+    // dicek untuk flow kedua dan flow pertama jangan sampai mengacaukan flow pertama
+
+
+    public function submitFinalAnswer(Request $request)
+    {
+        /* ====================================================
+     * 1️⃣ AMBIL DATA SESI FORM
+     * ==================================================== */
         $formUtama      = session('form_utama', []);
         $formKualitas   = session('form_kualitas', []);
         $formHarga      = session('form_harga', []);
         $formPengiriman = session('form_pengiriman', []);
         $formPelayanan  = session('form_pelayanan', []);
-        $formGimmick = session('form_gimmick', []);
+        $formGimmick    = session('form_gimmick', []);
 
-        $outletId = session('master_outlet_survey_id');
+        $outletId = session('master_outlet_survey_id'); // Ini hanya ada di Flow 1 (Link Otomatis)
         $kodeUnik = session('kode_unik');
 
-        // if (!$outletId || !$kodeUnik || empty($formUtama)) {
-        //     // return redirect()->route('home')->with('error', 'Sesi tidak lengkap. Silakan ulangi.');
-        //      return redirect('/')->with('error', 'Sesi tidak lengkap. Silakan ulangi.');
-
-        // }
-
-        // if (!$outletId) {
-        //     return redirect('/')->with('error', 'Outlet tidak ditemukan. Ulangi dari awal.');
-        // }
-
-        // if (empty($formUtama)) {
-        //     return redirect()->route('form-utama')
-        //         ->with('error', 'Silakan isi form utama terlebih dahulu.');
-        // }
-
-        if (!$outletId || empty($formUtama)) {
+        // PENYESUAIAN VALIDASI AKSES:
+        // Form Utama tidak boleh kosong, tetapi $outletId BOLEH kosong (karena Flow 2 tidak punya outletId)
+        if (empty($formUtama)) {
             return redirect('/')
                 ->with('error', 'Sesi tidak lengkap. Silakan ulangi dari awal.');
         }
 
-        /* =======================
-     * 3️⃣ PROSES FOTO
-     * ======================= */
+        /* ====================================================
+     * 2️⃣ PROSES FOTO BASE64
+     * ==================================================== */
         $fotoPath = null;
         if ($request->filled('foto_base64')) {
             try {
@@ -631,84 +946,68 @@ class RespondentController extends Controller
             }
         }
 
-        /* =======================
-     * 4️⃣ SIMPAN RESPONDENT (SELALU)
-     * ======================= */
-        $provId = $formUtama['provinsi'] ?? null;
-        $kabId  = $formUtama['kabupaten'] ?? null;
-
-        $outletSurvey = MasterOutletSurvey::find($outletId);
-
-
-
-        // bagian ini sama seperti bawahnya hanya saja untuk lebih advance mengecek periode aktif
-        // $periodeAktif = MasterPeriode::whereDate('tanggal_mulai', '<=', now())
-        //     ->whereDate('tanggal_selesai', '>=', now())
-        //     ->first();
-
-
-        // untuk cek mencari periode yang aktif
+        /* ====================================================
+     * 3️⃣ AMBIL PERIODE AKTIF SURVEY
+     * ==================================================== */
         $periodeAktif = MasterPeriode::where('status', 'aktif')->first();
 
         if (!$periodeAktif) {
-            return redirect()->route('home')
-                ->with('error', 'Periode tidak aktif.');
+            return redirect('/')
+                ->with('error', 'Periode survey tidak aktif.');
         }
 
         $periodeId = $periodeAktif->id;
 
-        $respondent = MasterRespondent::create([
-            'master_outlet_survey_id'  => $outletId,
-            'master_kabupaten_id'      => $kabId,
-            'periode_id'               => $periodeId,
-            // 'telepone_respondent'      => $phone,
-            'telepone_respondent'      => $formUtama['telepone_respondent'] ?? null,
-            'provinsi_id'              => $provId,
-            'jenis_pertanyaan_id'      => $formUtama['jenis_pertanyaan_id'] ?? null,
-            'nama_respondent'          => $formUtama['nama_respondent'] ?? null,
-            'nama_toko_respondent'     => $formUtama['nama_toko_respondent'] ?? null,
-            'alamat_toko_respondent'   => $formUtama['alamat_toko_respondent'] ?? null,
-            'foto_selfie'              => $fotoPath,
-            'is_gimmick'               => $formGimmick['is_gimmick'] ?? null,
-        ]);
+        /* ====================================================
+     * 4️⃣ LOGIKA INSERT DATA RESPONDENT (FLOW 1 vs FLOW 2)
+     * ==================================================== */
 
-        /* =======================
-     * 5️⃣ CEK KE TABEL PLOT (LOGIC MENANG)
-     * ======================= */
+        // Ambil ID Provinsi & Kabupaten dari inputan form utama
+        $provId = $formUtama['provinsi'] ?? null;
+        $kabId  = $formUtama['kabupaten'] ?? null;
 
-        // $hadiahNama = null;
+        // Siapkan array data yang akan disimpan ke MasterRespondent
+        $insertData = [
+            'master_kabupaten_id'     => $kabId,
+            'periode_id'              => $periodeId,
+            'telepone_respondent'     => $formUtama['telepone_respondent'] ?? null,
+            'provinsi_id'             => $provId,
+            'jenis_pertanyaan_id'     => $formUtama['jenis_pertanyaan_id'] ?? null,
+            'nama_respondent'         => $formUtama['nama_respondent'] ?? null,
+            'foto_selfie'             => $fotoPath,
+            'is_gimmick'              => $formGimmick['is_gimmick'] ?? null,
+        ];
 
-        // if ($kabId && $provId && $periodeId) {
+        // PERCABANGAN BERDASARKAN FLOW:
+        if (!empty($outletId)) {
+            // [FLOW 1] Jika lewat Link Otomatis (Ada ID Outlet Master)
+            $insertData['master_outlet_survey_id']  = $outletId;
+            $insertData['nama_toko_respondent']     = $formUtama['nama_toko_respondent'] ?? null;
+            $insertData['alamat_toko_respondent']   = $formUtama['alamat_toko_respondent'] ?? null;
 
-        //     $plot = PlotHadiahSurvey::where('master_outlet_survey_id', $outletId)
-        //         ->where('master_kabupaten_id', $kabId)
-        //         ->where('provinsi_id', $provId)
-        //         ->where('periode_survey_id', $periodeId)
-        //         ->where('is_winning', 'N')
-        //         ->first();
+            // Kolom project manual di-set null
+            $insertData['nama_customer_project']    = null;
+            $insertData['nama_toko_project']        = null;
+            $insertData['alamat_toko_project']      = null;
+        } else {
+            // [FLOW 2] Jika lewat Input Manual (Tidak membawa ID Outlet)
+            $insertData['master_outlet_survey_id']  = null; // Karena sudah diubah jadi nullable()
+            $insertData['nama_toko_respondent']     = null;
+            $insertData['alamat_toko_respondent']   = null;
 
-        //     if ($plot) {
-        //         // 🎉 MENANG
-        //         $plot->update([
-        //             'is_winning'       => 'Y',
-        //             'status_respondent_assigned' => 'Y',
-        //             'respondent_id' => $respondent->id,
-        //             'tanggal_menang'   => now()->toDateString(),
-        //         ]);
+            // Isi ke kolom-kolom baru hasil manual input project
+            $insertData['nama_customer_project']    = $formUtama['nama_customer_project'] ?? null;
+            $insertData['nama_toko_project']        = $formUtama['nama_toko_project'] ?? null;
+            $insertData['alamat_toko_project']      = $formUtama['alamat_toko_project'] ?? null;
+        }
 
-        //         $respondent->update([
-        //             'hadiah_id'  => $plot->hadiah_id,
-        //             'is_winner'  => 'Y',
-        //         ]);
-
-        //         $hadiahNama = optional($plot->hadiah)->nama_hadiah;
-        //     }
-        // }
-
-        /* =======================
-     * 6️⃣ SIMPAN JAWABAN
-     * ======================= */
+        // Eksekusi Insert Ke Database
+        $respondent = MasterRespondent::create($insertData);
         $respondentId = $respondent->id;
+
+        /* ====================================================
+     * 5️⃣ SIMPAN JAWABAN PERTANYAAN SURVEY
+     * ==================================================== */
         $all = array_filter(array_merge($formUtama, $formKualitas, $formHarga, $formPengiriman, $formPelayanan));
 
         foreach ($all as $key => $val) {
@@ -737,45 +1036,17 @@ class RespondentController extends Controller
             }
         }
 
-        /* =======================
-     * 7️⃣ UPDATE KODE UNIK OUTLET
-     * ======================= */
-        MasterOutletSurvey::where('id', $outletId)
-            ->update(['status_kode_unik' => 'N']);
-
-        /* =======================
-     * 8️⃣ CLEAR SESSION
-     * ======================= */
-        // $visitSalesId = session('visit_sales_id');
-        // $spsName = session('sps_name');
-
-        // $encrypted = Crypt::encryptString(
-        //     $visitSalesId . '|' . $spsName
-        // );
-
-        // session()->forget([
-        //     'form_utama',
-        //     'form_kualitas',
-        //     'form_harga',
-        //     'form_pengiriman',
-        //     'form_pelayanan',
-        //     'form_gimmick',
-        //     'master_outlet_survey_id',
-        //     'kode_unik'
-        // ]);
-
-        $visitSalesId = session('visit_sales_form_id');
-        $spsName = session('sps_name');
-
-        if ($visitSalesId) {
-            $payload = $visitSalesId . '|' . $spsName;
-        } else {
-            $payload = $spsName;
+        /* ====================================================
+     * 6️⃣ UPDATE KODE UNIK (HANYA UNTUK FLOW 1)
+     * ==================================================== */
+        if (!empty($outletId)) {
+            MasterOutletSurvey::where('id', $outletId)
+                ->update(['status_kode_unik' => 'N']);
         }
 
-        // $encrypted = Crypt::encryptString($payload);
-
-
+        /* ====================================================
+     * 7️⃣ CLEAR SESSION SURVEY
+     * ==================================================== */
         session()->forget([
             'form_utama',
             'form_kualitas',
@@ -787,33 +1058,15 @@ class RespondentController extends Controller
             'kode_unik',
         ]);
 
-        /* =======================
-     * 9️⃣ REDIRECT + SWEETALERT
-     * ======================= */
-        //     if ($hadiahNama) {
-        //         return redirect()->route('home')
-        //             ->with('success', "🎉 Selamat! Anda mendapatkan hadiah: $hadiahNama");
-        //     }
-
-        //     return redirect()->route('home')
-        //         ->with('success', 'Terima kasih atas partisipasi Anda! Anda belum beruntung kali ini.');
-        // }
-
-        // return redirect()->away(
-        //     'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit/' . urlencode($encrypted)
-        // );
-
-
-        //(ini sudah hampir benar namun visit salse harus mendecrypt ulang)
-        // return redirect()->away(
-        //     'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit?token=' . urlencode($encrypted)
-        // );
-
+        /* ====================================================
+     * 8️⃣ REDIRECT REDIRECT KE URL EKSTERNAL / FINISH
+     * ==================================================== */
         $token = session('redirect_token');
         $store = session('redirect_store');
 
+        // Jika token redirect eksternal tidak lengkap, kembalikan ke halaman depan aplikasi
         if (!$token || !$store) {
-            return redirect('/')->with('error', 'Token redirect tidak ditemukan.');
+            return redirect('/')->with('success', 'Survey berhasil disimpan! Terima kasih.');
         }
 
         $url = 'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit/'
@@ -821,19 +1074,5 @@ class RespondentController extends Controller
             . '?store=' . urlencode($store);
 
         return redirect()->away($url);
-
-        // return redirect('/dummy-finish?token=' . urlencode($encrypted));
-
-        // return redirect()->away(
-        //     'http://127.0.0.1:8000/dummy-finish?token=' . urlencode($encrypted)
-        // );
-
-
-        // public function checkDuplicatePhone(Request $request)
-        // {
-        //     $phone = $request->query('phone');
-        //     $exists = MasterRespondent::where('telepone_respondent', $phone)->exists();
-        //     return response()->json(['exists' => $exists]);
-        // }
     }
 }
