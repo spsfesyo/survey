@@ -1069,7 +1069,7 @@ class RespondentController extends Controller
             return redirect('/')->with('success', 'Survey berhasil disimpan! Terima kasih.');
         }
 
-        $url = 'https://esstesting.edpapp.com:2096/form_kunjungan_pelanggan/edit/'
+        $url = 'https://ess.edpapp.com:2096/form_kunjungan_pelanggan/edit/'
             . $token
             . '?store=' . urlencode($store);
 
