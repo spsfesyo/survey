@@ -24,64 +24,6 @@ class RespondentController extends Controller
 {
     public function index(Request $request, $token = null)
     {
-        // try {
-
-        //     // 1️⃣ Ambil token (query prioritas)
-        //     $token = $request->store ?? $token;
-
-        //     if (!$token) {
-        //         abort(403, 'Token tidak ada');
-        //     }
-
-        //     // 2️⃣ Clean token
-        //     // $token = trim($token);
-        //     // $token = preg_replace('/[^A-Za-z0-9=\/+]/', '', $token);
-
-        //     // 3️⃣ Decrypt
-        //     $decrypt = Crypt::decryptString($token);
-
-        //     // 4️⃣ Parsing fleksibel
-        //     $data = explode('|', $decrypt);
-
-        //     if (count($data) == 2) {
-        //         // format: id|spsName
-        //         $idFormVisitSales = $data[0];
-        //         $spsName = $data[1];
-        //     } else {
-        //         // format: hanya spsName
-        //         $idFormVisitSales = null;
-        //         $spsName = $decrypt;
-        //     }
-
-        //     // 5️⃣ Cari outlet
-        //     $outlet = MasterOutletSurvey::where('sps_internal_name', $spsName)->first();
-
-        //     if (!$outlet) {
-        //         abort(404, 'Outlet tidak ditemukan');
-        //     }
-
-        //     session([
-        //         'raw_token' => $token,
-        //         'redirect_url' => $request->fullUrl(),
-        //     ]);
-
-        //     // 6️⃣ Simpan session
-        //     session([
-        //         'master_outlet_survey_id' => $outlet->id,
-        //         'visit_sales_form_id' => $idFormVisitSales, // boleh null
-        //         'sps_name' => $spsName,
-        //     ]);
-
-
-        //     // 7️⃣ Redirect ke form
-        //     return redirect()->route('form-utama');
-        // } catch (\Exception $e) {
-        //     Log::error('Decrypt gagal: ' . $e->getMessage());
-
-        //     return redirect('/')
-        //         ->with('error', 'Link tidak valid atau sudah expired.');
-        // }
-
 
         try {
 
@@ -112,6 +54,18 @@ class RespondentController extends Controller
                 abort(404, 'Outlet tidak ditemukan');
             }
 
+            if ($outlet->status_kode_unik !== 'Y') {
+                Log::warning("Kode unik outlet sudah tidak aktif untuk sps_name: $spsName");
+                return $this->redirectBackToExternal($pathToken, $store);
+            }
+
+            $periodeAktif = MasterPeriode::where('status', 'aktif')->first();
+
+            if (!$periodeAktif) {
+                Log::warning("Periode survey nonaktif saat outlet $spsName mencoba akses.");
+                return $this->redirectBackToExternal($pathToken, $store);
+            }
+
             // ✅ simpan untuk redirect nanti
             session([
                 'redirect_token' => $pathToken,
@@ -133,6 +87,11 @@ class RespondentController extends Controller
                 ->with('error', 'Link tidak valid atau sudah expired.');
         }
     }
+
+
+    // helper class
+
+
 
     // public function create(Request $request)
     // {
@@ -156,7 +115,13 @@ class RespondentController extends Controller
 
     public function getFormUtama()
     {
+        // pengecekan untuk periode aktif sebelum user mulai isi form utama
+        $periodeAktif = MasterPeriode::where('status', 'aktif')->first();
 
+        if (!$periodeAktif) {
+            return redirect('/')
+                ->with('error', 'Periode survey tidak aktif. Silakan coba lagi nanti.');
+        }
 
         // $outletId = session('master_outlet_survey_id');
 
@@ -268,6 +233,14 @@ class RespondentController extends Controller
 
     public function getFormProject()
     {
+        // ✅ Cek periode aktif SEBELUM user mulai isi form manual
+        $periodeAktif = MasterPeriode::where('status', 'aktif')->first();
+
+        if (!$periodeAktif) {
+            return redirect('/')
+                ->with('error', 'Periode survey tidak aktif. Silakan coba lagi nanti.');
+        }
+
         // Alur Project Tim biasanya bersifat umum/bebas isi, mirip Alur B
         // Kita panggil semua list provinsi agar user bisa milih lokasi project-nya
         $provinsis = MasterProvinsi::all();
@@ -1065,8 +1038,29 @@ class RespondentController extends Controller
         $store = session('redirect_store');
 
         // Jika token redirect eksternal tidak lengkap, kembalikan ke halaman depan aplikasi
-        if (!$token || !$store) {
+        // if (!$token || !$store) {
+        //     return redirect('/')->with('success', 'Survey berhasil disimpan! Terima kasih.');
+        // }
+
+        if (empty($outletId)) {
             return redirect('/')->with('success', 'Survey berhasil disimpan! Terima kasih.');
+        }
+
+        // $url = 'https://ess.edpapp.com:2096/form_kunjungan_pelanggan/edit/'
+        //     . $token
+        //     . '?store=' . urlencode($store);
+
+        // return redirect()->away($url);
+
+        return $this->redirectBackToExternal($token, $store);
+    }
+
+
+
+    private function redirectBackToExternal($token, $store)
+    {
+        if (!$token || !$store) {
+            return redirect('/')->with('error', 'Survey saat ini tidak dapat diisi.');
         }
 
         $url = 'https://ess.edpapp.com:2096/form_kunjungan_pelanggan/edit/'
