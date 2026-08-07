@@ -883,6 +883,8 @@ class RespondentController extends Controller
 
     public function submitFinalAnswer(Request $request)
     {
+        // info($request);
+        
         /* ====================================================
      * 1️⃣ AMBIL DATA SESI FORM
      * ==================================================== */
@@ -892,6 +894,8 @@ class RespondentController extends Controller
         $formPengiriman = session('form_pengiriman', []);
         $formPelayanan  = session('form_pelayanan', []);
         $formGimmick    = session('form_gimmick', []);
+
+        // info($formPelayanan);
 
         $outletId = session('master_outlet_survey_id'); // Ini hanya ada di Flow 1 (Link Otomatis)
         $kodeUnik = session('kode_unik');
@@ -906,18 +910,23 @@ class RespondentController extends Controller
         /* ====================================================
      * 2️⃣ PROSES FOTO BASE64
      * ==================================================== */
+    // info($formPelayanan['foto_base64']);
         $fotoPath = null;
-        if ($request->filled('foto_base64')) {
+        // if ($formPelayanan['foto_base64']) {
+            info("hahaha");
             try {
-                $base64 = preg_replace('#^data:image/\w+;base64,#i', '', $request->foto_base64);
+                $base64 = preg_replace('#^data:image/\w+;base64,#i', '', $formPelayanan['foto_base64']);
                 $data = base64_decode($base64);
                 $fileName = 'foto-respondent/' . Str::uuid() . '.jpg';
                 Storage::disk('public')->put($fileName, $data);
+                $result = Storage::disk('public')->put($fileName, $data);
+                // info("wkwkwkwk");
+                // info($result);
                 $fotoPath = 'storage/' . $fileName;
             } catch (\Throwable $e) {
                 logger('Foto gagal disimpan: ' . $e->getMessage());
             }
-        }
+        // }
 
         /* ====================================================
      * 3️⃣ AMBIL PERIODE AKTIF SURVEY
