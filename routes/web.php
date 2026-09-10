@@ -195,6 +195,12 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
     Route::get('/admin/report/export/{id}', [AdminReportController::class, 'export'])->name('report.export');
     //untuk export excelnya
     Route::get('/admin/report/export/{id}', [AdminReportController::class, 'export'])->name('admin-report-export');
+
+
+
+    //untuk report project
+    Route::get('/admin-report-project',[AdminReportController::class, 'indexProject'])->name('view-report-project');
+    Route::get('/admin-report-project/export/{id}', [AdminReportController::class, 'exportProject'])->name('report-project-export');
 });
 
 Route::middleware(['auth', 'role:1'])->group(function () {

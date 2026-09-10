@@ -49,12 +49,29 @@
             </li>
 
             {{-- untuk report kualitas bata blesscon dan superior --}}
-            <li class="{{ Request::is('view-report') ? 'active' : '' }}">
+
+
+            {{-- <li class="{{ Request::is('view-report') ? 'active' : '' }}">
                 <a class="nav-link" href={{ route('view-report') }}>
                     <i class="fas fa-bookmark"></i> <span>Report</span>
                 </a>
-            </li>
+            </li> --}}
 
+            {{-- Menu Utama Report (Dropdown) --}}
+            {{-- Report Kualitas Bata (Stisla Dropdown Menu) --}}
+            <li class="dropdown {{ Request::is('report*') ? 'active' : '' }}">
+                <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
+                    <i class="fas fa-bookmark"></i> <span>Report Respondent</span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="{{ Request::is('view-report') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('view-report') }}">Report Outlet</a>
+                    </li>
+                    <li class="{{ Request::is('report/superior') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{route('view-report-project')}}">Report Project</a>
+                    </li>
+                </ul>
+            </li>
 
 
             {{-- <li class="{{ Request::is('konfig-survey') ? 'active' : '' }}">
@@ -72,11 +89,11 @@
                     </a>
                 </li> --}}
 
-                <li class="{{ Request::is('admin-list-pertanyaan') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('admin-list-pertanyaan') }}">
-                        <i class="fas fa-file-pdf"></i> <span>List Pertanyaan</span>
-                    </a>
-                </li>
+                {{-- <li class="{{ Request::is('admin-list-pertanyaan') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin-list-pertanyaan') }}">
+                            <i class="fas fa-file-pdf"></i> <span>List Pertanyaan</span>
+                        </a>
+                    </li> --}}
 
                 <li class="{{ Request::is('admin-blast-wa') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('admin-blast-wa') }}">

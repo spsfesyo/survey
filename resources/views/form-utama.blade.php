@@ -80,7 +80,7 @@
                                             <input type="text" class="form-control"
                                                 value="{{ $outlet->sps_internal_name }}" readonly>
                                             <input type="hidden" name="nama_toko_respondent"
-                                                value="{{ $outlet->id }}">
+                                                value="{{ $outlet->sps_internal_name }}">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 20px;">

@@ -19,7 +19,7 @@
                 <div class="col-lg-12 col-md-12 col-12 col-sm-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="mb-0">Report All Section</h4>
+                            <h4 class="mb-0">Report Outlet</h4>
                         </div>
 
 
@@ -81,9 +81,12 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <form action="{{ route('admin-report-export', $item->id) }}" method="GET">
+                                                    <form action="{{ route('admin-report-export', $item->id) }}"
+                                                        method="GET">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-primary">Detail</button>
+                                                        <button type="submit" class="btn btn-success">
+                                                            <i class="fas fa-file-excel mr-1"></i> Download
+                                                        </button>
                                                     </form>
                                                 </td>
                                             </tr>
