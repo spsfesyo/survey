@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
 @endpush
 
-@section('main')
+
 
 @section('main')
 
@@ -38,39 +38,44 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Status Outlet</h1>
+                <h1>Status Outlet Telah Mengisi</h1>
             </div>
 
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4>Tabel Status Blast Outlet Berhasil </h4>
-                            <div class="d-flex">
-                                {{-- Search Mobile Button --}}
-                                <a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none mr-2 ">
+                        <div class="card-header ">
+                            <h4>Status Outlet Telah Mengisi </h4>
+
+
+
+
+
+
+                            {{-- <a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none mr-2 ">
                                     <i class="fas fa-search text-primary"></i>
                                 </a>
 
-                                {{-- Search Box --}}
-                                <form action="{{route('admin-status-outlet')}}" method="GET" class="search-element d-flex align-items-center mr-3">
+                                <form action="{{ route('admin-status-outlet') }}" method="GET"
+                                    class="search-element d-flex align-items-center mr-3">
                                     <input class="form-control" type="search" name="search" placeholder="Search"
                                         aria-label="Search" data-width="250" value="{{ request('search') }}">
                                     <button class="btn" type="submit">
                                         <i class="fas fa-search"></i>
                                     </button>
 
-                                    {{-- <div class="search-backdrop"></div>
-                                    <div class="search-result"></div> --}}
-                                </form>
+                                    <div class="search-backdrop"></div>
+                                    <div class="search-result"></div>
+                                </form> --}}
 
-                                <form action="{{ route('status.export') }}" method="GET" class="d-inline">
+
+                            {{-- <form action="{{ route('status.export') }}" method="GET" class="d-inline">
                                     @csrf
                                     <button type="submit" class="btn btn-success mr-2">
                                         Export Excel
                                     </button>
-                                </form>
-
+                                </form> --}}
+                            {{--
                                 @if ($role->id == 1)
                                     <div class="dropdown d-inline">
                                         <button class="btn btn-primary dropdown-toggle" type="button"
@@ -102,22 +107,88 @@
 
                                         </div>
                                     </div>
-                                @endif
+                                @endif --}}
+                        </div>
+
+                        <div class="card-body">
+                            <div class="col-12 col-md-12 col-lg-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4>Pilih Tanggal Periode</h4>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <form method="GET" action="">
+                                            <div class="row align-items-end">
+
+                                                <div class="form-group col-md-3">
+                                                    <label>Tanggal Periode</label>
+                                                    <input type="date" class="form-control" name="tanggal">
+                                                </div>
+
+                                                {{-- <div class="form-group col-md-3">
+                                                    <label>Tanggal Selesai</label>
+                                                    <input type="date" class="form-control" name="end_date">
+                                                </div> --}}
+
+                                                <div class="form-group col-md-2">
+                                                    <button type="submit" class="btn btn-success btn-block">
+                                                        Cari
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            {{-- <div class="table-responsive">
-                                <table class="table-bordered table-md table">
-                                    <tr>
-                                        <th>No</th>
-                                        Disable Kode Unik
-                                        </a>
-                                        @endif
-                            </div> --}}
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table-bordered table-md table">
+
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-bordered table-md table">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Periode Mulai</th>
+                                            <th>Periode Selesai</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+
+                                        @forelse ($periode as $item)
+                                            <tr>
+                                                <td>{{ $periode->firstItem() + $loop->index }}</td>
+                                                <td>{{ $item->tanggal_mulai }}</td>
+                                                <td>{{ $item->tanggal_selesai }}</td>
+                                                <td>
+                                                    @if ($item->status == 'aktif')
+                                                        <div class="badge badge-success">Aktif</div>
+                                                    @else
+                                                        <div class="badge badge-danger">Non Aktif</div>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <form action="{{ route('export-status-outlet', $item->id) }}"
+                                                        method="GET">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-success">
+                                                            <i class="fas fa-file-excel mr-1"></i> Download
+                                                        </button>
+                                                    </form>
+
+                                                    {{-- <a href="{{ route('admin.status.outlet.edit', $item->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        <a href="{{ route('admin.status.outlet.destroy', $item->id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">Hapus</a> --}}
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="text-center">Tidak ada data periode.</td>
+                                            </tr>
+                                        @endforelse
+
+                                    </table>
+                                </div>
+                            </div>
+                            {{-- <table class="table-bordered table-md table">
                                     <tr>
                                         <th>No</th>
                                         <th>Nama Outlet</th>
@@ -150,42 +221,40 @@
                                                 @endif
                                             </td>
 
-                                            {{-- Provinsi via kabupaten --}}
+
                                             <td>{{ $item->kabupaten?->provinsi?->nama_provinsi }}</td>
 
-                                            {{-- Nama kabupaten langsung dari master_kabupaten_id --}}
+
                                             <td>{{ $item->kabupaten?->nama_kabupaten }}</td>
 
-                                            {{-- Area via kabupaten --}}
+
                                             <td>{{ $item->kabupaten?->area?->nama_area }}</td>
                                             @if ($role->id == 1)
                                                 <td>
-                                                    {{-- <form action="#" method="" class="d-inline">
-                                                        @csrf --}}
+
                                                     <button type="button" data-id="{{ $item->id }}"
                                                         data-status="{{ $item->status_kode_unik }}"
                                                         class="btn btn-warning mr-2 fas fa-pencil-alt btn-edit"
                                                         data-toggle="modal" data-target="#modalEditPerdataOutlet">
                                                     </button>
-                                                    {{-- </form> --}}
+
                                                 </td>
                                             @endif
                                         </tr>
                                     @endforeach
 
-                                </table>
-                            </div>
+
+                                </table> aaaaaaaa --}}
+
                         </div>
-                        <div class="card-footer text-right">
+                    </div>
+                    {{-- <div class="card-footer text-right">
 
                             <nav class="d-inline-block">
                                 {{ $status->onEachSide(0)->links() }}
                             </nav>
-                        </div>
-                        {{-- <div class="card-footer text-right">
-                            {{ $status->links() }}
                         </div> --}}
-                    </div>
+
                 </div>
             </div>
         </section>

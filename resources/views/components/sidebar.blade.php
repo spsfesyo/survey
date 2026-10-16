@@ -26,27 +26,17 @@
                 </ul> --}}
             </li>
 
-            <li class="{{ Request::is('admin-statistik') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin-statistik') }}"><i class="fas fa-calculator"></i>
-                    <span>Statistik</span></a>
-            </li>
+            {{-- <li class="{{ Request::is('admin-statistik') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('admin-statistik') }}"><i class="fas fa-calculator"></i>
+                        <span>Statistik</span></a>
+                </li> --}}
 
             {{-- <li class="{{ Request::is('admin-doorprize') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin-doorprize') }}"><i class="fas fa-gift"></i>
                     <span>Doorprize</span></a>
             </li> --}}
 
-            <li class="{{ Request::is('admin-status-outlet') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin-status-outlet') }}">
-                    <i class="fas fa-bar-chart"></i> <span>Status Outlet</span>
-                </a>
-            </li>
 
-            <li class="{{ Request::is('admin-list-pertanyaan') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin-list-pertanyaan') }}">
-                    <i class="fas fa-file-pdf"></i> <span>List Pertanyaan</span>
-                </a>
-            </li>
 
             {{-- untuk report kualitas bata blesscon dan superior --}}
 
@@ -59,20 +49,58 @@
 
             {{-- Menu Utama Report (Dropdown) --}}
             {{-- Report Kualitas Bata (Stisla Dropdown Menu) --}}
-            <li class="dropdown {{ Request::is('report*') ? 'active' : '' }}">
+            <li
+                class="dropdown {{ Request::is('admin-status-outlet', 'admin-list-pertanyaan', 'view-report', 'report/superior') ? 'active' : '' }}">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
-                    <i class="fas fa-bookmark"></i> <span>Report Respondent</span>
+                    <i class="fas fa-bookmark"></i> <span>Report Respondent Keseluruhan</span>
                 </a>
                 <ul class="dropdown-menu">
+                    <li class="{{ Request::is('admin-status-outlet') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin-status-outlet') }}">
+                            <i class="fas fa-bar-chart"></i> <span>Status Outlet</span>
+                        </a>
+                    </li>
+
+                    <li class="{{ Request::is('admin-list-pertanyaan') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin-list-pertanyaan') }}">
+                            <i class="fas fa-file-pdf"></i> <span>List Pertanyaan</span>
+                        </a>
+                    </li>
+
+
                     <li class="{{ Request::is('view-report') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('view-report') }}">Report Outlet</a>
+                        <a class="nav-link" href="{{ route('view-report') }}">
+                            <i class="fas fa-shop"></i> <span>statistik Outlet</span></a>
                     </li>
                     <li class="{{ Request::is('report/superior') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{route('view-report-project')}}">Report Project</a>
+                        <a class="nav-link" href="{{ route('view-report-project') }}">
+                            <i class="fas fa-store"></i> <span>statistik Project</span></a>
                     </li>
                 </ul>
             </li>
 
+
+
+            <li class="dropdown {{ Request::is('*outlet-qualified*') ? 'active' : '' }}">
+                <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
+                    <i class="fas fa-bookmark"></i> <span>Report Respondent 100 m³</span>
+                </a>
+
+                <ul class="dropdown-menu">
+                    <li class="{{ Request::is('report-outlet-qualified') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('report-outlet-qualified') }}">
+                            <i class="fas fa-bar-chart"></i> <span>Status Outlet</span>
+                        </a>
+                    </li>
+
+
+                    <li class="{{ Request::is('view-report-outlet-qualified') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('view-report-outlet-qualified') }}">
+                            <i class="fas fa-shop"></i> <span>statistik Outlet</span></a>
+                    </li>
+                </ul>
+
+            </li>
 
             {{-- <li class="{{ Request::is('konfig-survey') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('konfig-survey') }}">

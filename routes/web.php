@@ -4,18 +4,26 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminBlastController;
 use App\Http\Controllers\AdminBlastManual;
 use App\Http\Controllers\AdminKonfigController;
+use App\Http\Controllers\AdminOutletKualifikasi;
 use App\Http\Controllers\AdminPdfController;
 use App\Http\Controllers\AdminPlotController;
 use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\AdminStatistikController;
 use App\Http\Controllers\AdminStatusOutlet;
 use App\Http\Controllers\DoorprizeController;
+use App\Http\Controllers\OutletQualifiedController;
+use App\Http\Controllers\OutletQualifiedReportController;
 use App\Http\Controllers\RespondentController;
 use App\Http\Controllers\testController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+
+// test route
+
+// Route::get('/test/outlet-Array/{id}', [AdminOutletKualifikasi::class, 'cekOutletTerdaftarSurvey']);
 
 
 
@@ -185,22 +193,32 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
     Route::post('/disable-kode-unik', [AdminStatusOutlet::class, 'DisableAllStatusCode'])->name('disable-kode-unik');
     Route::post('/outlet-status/update', [AdminStatusOutlet::class, 'updateStatusCode'])->name('outlet-status-kode-update');
     Route::post('/outlet-status/regenerate', [AdminStatusOutlet::class, 'RegenerateUnikCode'])->name('outlet-regenerate-unik-code');
+    Route::get('/export-status-outlet/{id}', [AdminStatusOutlet::class, 'exportStatusOutlet'])->name('export-status-outlet');
 
+    // status outlet qualified
+    Route::get('/report/outlet-qualified', [OutletQualifiedController::class, 'index'])->name('report-outlet-qualified');
+    Route::get('/report/outlet-qualified/export/{id}', [OutletQualifiedController::class, 'export'])->name('report-outlet-qualified-export');
 
     //report
 
     //untuk menampilkan index
     Route::get('/admin-report', [AdminReportController::class, 'index'])->name('view-report');
     //untuk get dan submit date picker periode
-    Route::get('/admin/report/export/{id}', [AdminReportController::class, 'export'])->name('report.export');
+    // Route::get('/admin/report/export/{id}', [AdminReportController::class, 'export'])->name('report.export');
     //untuk export excelnya
     Route::get('/admin/report/export/{id}', [AdminReportController::class, 'export'])->name('admin-report-export');
 
-
-
     //untuk report project
+
+    // Route::get('/admin/report/satus-outlet/{id}',[AdminStatusOutlet::class, 'export'])
+
     Route::get('/admin-report-project',[AdminReportController::class, 'indexProject'])->name('view-report-project');
     Route::get('/admin-report-project/export/{id}', [AdminReportController::class, 'exportProject'])->name('report-project-export');
+
+    //Report untuk jawaban per provinsi qualified outlet
+
+    Route::get('/report-answer-outlet-qualified',[OutletQualifiedReportController::class,'index'])->name('view-report-outlet-qualified');
+    Route::get('/report-answer-outlet-qualified/export/{id}',[OutletQualifiedReportController::class,'exportReport'])->name('download-outlet-qualified-export');
 });
 
 Route::middleware(['auth', 'role:1'])->group(function () {
