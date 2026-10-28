@@ -218,7 +218,7 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
     //Report untuk jawaban per provinsi qualified outlet
 
     Route::get('/report-answer-outlet-qualified',[OutletQualifiedReportController::class,'index'])->name('view-report-outlet-qualified');
-    Route::get('/report-answer-outlet-qualified/export/{id}',[OutletQualifiedReportController::class,'exportReport'])->name('download-outlet-qualified-export');
+    Route::get('/report-answer-outlet-qualified/export/{id}',[OutletQualifiedReportController::class,'exportReport'])->name('download   -outlet-qualified-export');
 });
 
 Route::middleware(['auth', 'role:1'])->group(function () {

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\MasterPeriode;
+use App\Models\MasterPertanyaan;
+use App\Models\MasterRespondent;
 use App\Services\OutletQualifiedService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,9 +18,7 @@ class OutletQualifiedController extends Controller
     /**
      * FUNGSI 1: Ambil periode dari master_periode.
      */
-   public function __construct(private OutletQualifiedService $service)
-    {
-    }
+    public function __construct(private OutletQualifiedService $service) {}
 
 
     /**
@@ -70,29 +70,35 @@ class OutletQualifiedController extends Controller
         $hasil   = $this->service->cari((int) $id);
         $periode = $hasil['periode'];
 
-        $baris = $this->susunBaris($hasil);
-        $label = (string) $periode->tanggal_mulai . ' - ' . (string) $periode->tanggal_selesai;
+        // Daftar pertanyaan diambil SEKALI, dipakai untuk susun baris & header template
+        $pertanyaanList = MasterPertanyaan::orderBy('id')->get();
+
+        $baris  = $this->susunBaris($hasil, $pertanyaanList);
+        $label  = (string) $periode->tanggal_mulai . ' - ' . (string) $periode->tanggal_selesai;
         $minQty = $hasil['min_qty'];
 
         return Excel::download(
-            new class($baris, $label, $minQty) implements FromView {
+            new class($baris, $label, $minQty, $pertanyaanList) implements FromView {
                 protected $baris;
                 protected $label;
                 protected $minQty;
+                protected $pertanyaanList;
 
-                public function __construct($baris, $label, $minQty)
+                public function __construct($baris, $label, $minQty, $pertanyaanList)
                 {
-                    $this->baris  = $baris;
-                    $this->label  = $label;
-                    $this->minQty = $minQty;
+                    $this->baris          = $baris;
+                    $this->label          = $label;
+                    $this->minQty         = $minQty;
+                    $this->pertanyaanList = $pertanyaanList;
                 }
 
                 public function view(): \Illuminate\Contracts\View\View
                 {
                     return view('Admin.GeneralReport.template-outlet-qualified', [
-                        'baris'  => $this->baris,
-                        'periode' => $this->label,
-                        'minQty' => $this->minQty,
+                        'baris'          => $this->baris,
+                        'periode'        => $this->label,
+                        'minQty'         => $this->minQty,
+                        'pertanyaanList' => $this->pertanyaanList,
                     ]);
                 }
             },
@@ -100,12 +106,16 @@ class OutletQualifiedController extends Controller
         );
     }
 
-
     /**
      * Susun baris Excel: 1 baris per toko, data diambil dari baris
      * master_outlet_survey yang punya respondent; lokasi dari master_respondent.
      */
-    private function susunBaris(array $hasil): array
+    /**
+     * Susun baris Excel: 1 baris per toko (SPS).
+     * Data diambil dari baris master_outlet_survey yang punya respondent,
+     * lengkap dengan jawaban survey, foto, dan identitas respondent.
+     */
+    private function susunBaris(array $hasil, $pertanyaanList): array
     {
         $periodeId = $hasil['periode']->id;
 
@@ -119,31 +129,109 @@ class OutletQualifiedController extends Controller
             }
         }
 
-        $lokasi = DB::table('master_respondent as r')
-            ->leftJoin('master_provinsi as pv', 'r.provinsi_id', '=', 'pv.id')
-            ->leftJoin('master_kabupaten as kb', 'r.master_kabupaten_id', '=', 'kb.id')
-            ->leftJoin('master_area as ar', 'r.area_id', '=', 'ar.id')
-            ->where('r.periode_id', $periodeId)
-            ->whereIn('r.master_outlet_survey_id', $idBarisIsi)
-            ->select(
-                'r.master_outlet_survey_id',
-                DB::raw('MAX(pv.nama_provinsi) as provinsi'),
-                DB::raw('MAX(kb.nama_kabupaten) as kabupaten'),
-                DB::raw('MAX(ar.nama_area) as area')
-            )
-            ->groupBy('r.master_outlet_survey_id')
+        if (empty($idBarisIsi)) {
+            return [];
+        }
+
+        // Ambil semua respondent + relasi lengkap, dikelompokkan per outlet survey
+        $respondents = MasterRespondent::with([
+            'answers.options',
+            'provinsi',
+            'kabupaten',
+            'area',
+            'outletSurvey',
+            'JenisPertanyaan',
+        ])
+            ->where('periode_id', $periodeId)
+            ->whereIn('master_outlet_survey_id', $idBarisIsi)
+            ->orderBy('id')
             ->get()
-            ->keyBy('master_outlet_survey_id');
+            ->groupBy('master_outlet_survey_id');
 
         $baris = [];
 
         foreach ($hasil['lolos'] as $sps) {
             $barisIsi = array_values(array_filter(
                 $sps['outlet_survey'],
-                fn ($b) => $b['jumlah_respondent'] > 0
+                fn($b) => $b['jumlah_respondent'] > 0
             ));
 
-            $lok = $lokasi->get($barisIsi[0]['outlet_survey_id']);
+            if (empty($barisIsi)) {
+                continue;
+            }
+
+            // Kumpulkan respondent dari SEMUA baris outlet survey milik SPS ini
+            $respondentList = collect();
+            foreach ($barisIsi as $b) {
+                $respondentList = $respondentList->merge(
+                    $respondents->get($b['outlet_survey_id'], collect())
+                );
+            }
+            $respondentList = $respondentList->sortBy('id')->values();
+            $respondent     = $respondentList->first();
+            // dd([
+            //     'jumlah_respondent_terbaca' => $respondentList->count(),
+            //     'respondent_attr'           => $respondent?->only([
+            //         'id',
+            //         'nama_respondent',
+            //         'nama_toko_respondent',
+            //         'alamat_toko_respondent',
+            //         'telepone_respondent',
+            //         'provinsi_id',
+            //         'master_kabupaten_id',
+            //         'jenis_pertanyaan_id',
+            //     ]),
+            //     'pertanyaan_tipe5' => $pertanyaanList
+            //         ->where('master_tipe_pertanyaan_id', 5)
+            //         ->map(fn($p) => [
+            //             'id'        => $p->id,
+            //             'pertanyaan' => $p->pertanyaan,
+            //             'tipe'      => $p->master_tipe_pertanyaan_id,
+            //             'reference' => $p->reference,
+            //         ])->values(),
+            //     'jumlah_answers' => $respondent?->answers->count(),
+            // ]);
+
+            // Susun jawaban per pertanyaan
+            $jawaban = [];
+
+            foreach ($pertanyaanList as $pertanyaan) {
+                $nilaiList = [];
+
+                foreach ($respondentList as $r) {
+                    if ($pertanyaan->master_tipe_pertanyaan_id == 5 && $pertanyaan->reference) {
+                        // Tipe reference: ambil dari kolom/relasi master_respondent
+                        switch ($pertanyaan->reference) {
+                            case 'provinsi_id':
+                                $nilai = $r->provinsi->nama_provinsi ?? null;
+                                break;
+                            case 'master_kabupaten_id':
+                                $nilai = $r->kabupaten->nama_kabupaten ?? null;
+                                break;
+                            case 'jenis_pertanyaan_id':
+                                $nilai = $r->JenisPertanyaan->jenis_pertanyaan ?? null;
+                                break;
+                            default:
+                                $nilai = $r->{$pertanyaan->reference} ?? null;
+                        }
+                        $nilaiList[] = $nilai;
+                    } else {
+                        // Tipe biasa: ambil dari tabel answers
+                        foreach ($r->answers->where('master_pertanyaan_id', $pertanyaan->id) as $ans) {
+                            $option = $ans->options->options ?? null;
+
+                            if (in_array(strtolower((string) $option), ['other', 'lainnya'], true)) {
+                                $option = $ans->lainnya ?? 'Other';
+                            }
+
+                            $nilaiList[] = $option ?? ($ans->jawaban_teks ?? $ans->lainnya);
+                        }
+                    }
+                }
+
+                $nilaiList = array_unique(array_filter($nilaiList, fn($v) => $v !== null && $v !== ''));
+                $jawaban[$pertanyaan->id] = $nilaiList ? implode(' / ', $nilaiList) : '-';
+            }
 
             $baris[] = [
                 'nama_outlet'         => $this->gabung($barisIsi, 'nama_outlet'),
@@ -152,15 +240,16 @@ class OutletQualifiedController extends Controller
                 'kode_unik'           => $this->gabung($barisIsi, 'kode_unik'),
                 'total_qty'           => $sps['total_qty'],
                 'jumlah_respondent'   => $sps['jumlah_respondent'],
-                'provinsi'            => $lok->provinsi ?? '-',
-                'kabupaten'           => $lok->kabupaten ?? '-',
-                'area'                => $lok->area ?? '-',
+                'area'                => $respondent->area->nama_area ?? '-',
+                'jawaban'             => $jawaban,
+                'foto_url'            => $respondent && $respondent->foto_selfie
+                    ? asset($respondent->foto_selfie)
+                    : '-',
             ];
         }
 
         return $baris;
     }
-
 
     /** Gabungkan nilai unik dari beberapa baris, dipisah " / " */
     private function gabung(array $baris, string $kolom): string

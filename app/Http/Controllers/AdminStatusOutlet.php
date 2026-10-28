@@ -101,29 +101,52 @@ class AdminStatusOutlet extends Controller
 
                 public function view(): \Illuminate\Contracts\View\View
                 {
-                    $data = DB::table('master_respondent as r')
-                        ->join('master_outlet_survey as os', 'r.master_outlet_survey_id', '=', 'os.id')
-                        ->leftJoin('master_provinsi as pv', 'r.provinsi_id', '=', 'pv.id')
-                        ->leftJoin('master_kabupaten as kb', 'r.master_kabupaten_id', '=', 'kb.id')
-                        ->leftJoin('master_area as ar', 'r.area_id', '=', 'ar.id')
-                        ->leftJoin('master_periode_survey as p', 'r.periode_id', '=', 'p.id')
-                        ->select(
-                            'os.nama_outlet',
-                            'os.sps_internal_name as nama_outlet_console',
-                            'os.telepone_outlet',
-                            'os.kode_unik',
-                            DB::raw("CONCAT(p.tanggal_mulai, ' - ', p.tanggal_selesai) as periode"),
-                            DB::raw('COALESCE(pv.nama_provinsi, "-") as provinsi'),
-                            DB::raw('COALESCE(kb.nama_kabupaten, "-") as kabupaten'),
-                            DB::raw('COALESCE(ar.nama_area, "-") as area')
-                        )
-                        ->where('r.periode_id', $this->periodeId)
-                        ->whereNotNull('r.periode_id') // 👈 syarat: periode tidak null
-                        ->orderBy('os.nama_outlet')
+                    // $data = DB::table('master_respondent as r')
+                    //     ->join('master_outlet_survey as os', 'r.master_outlet_survey_id', '=', 'os.id')
+                    //     ->leftJoin('master_provinsi as pv', 'r.provinsi_id', '=', 'pv.id')
+                    //     ->leftJoin('master_kabupaten as kb', 'r.master_kabupaten_id', '=', 'kb.id')
+                    //     ->leftJoin('master_area as ar', 'r.area_id', '=', 'ar.id')
+                    //     ->leftJoin('master_periode_survey as p', 'r.periode_id', '=', 'p.id')
+                    //     ->select(
+                    //         'os.nama_outlet',
+                    //         'os.sps_internal_name as nama_outlet_console',
+                    //         'os.telepone_outlet',
+                    //         'os.kode_unik',
+                    //         DB::raw("CONCAT(p.tanggal_mulai, ' - ', p.tanggal_selesai) as periode"),
+                    //         DB::raw('COALESCE(pv.nama_provinsi, "-") as provinsi'),
+                    //         DB::raw('COALESCE(kb.nama_kabupaten, "-") as kabupaten'),
+                    //         DB::raw('COALESCE(ar.nama_area, "-") as area')
+                    //     )
+                    //     ->where('r.periode_id', $this->periodeId)
+                    //     ->whereNotNull('r.periode_id') // 👈 syarat: periode tidak null
+                    //     ->orderBy('os.nama_outlet')
+                    //     ->get();
+
+                    // return view('Admin.GeneralReport.template-status-outlet', [
+                    //     'data' => $data,
+                    // ]);
+
+                    // 1. Daftar pertanyaan (sama seperti view index)
+                    $pertanyaanList = \App\Models\MasterPertanyaan::orderBy('id')->get();
+
+                    // 2. Respondent + relasi lengkap
+                    $data = \App\Models\MasterRespondent::with([
+                        'outletSurvey',
+                        'provinsi',
+                        'kabupaten',
+                        'area',
+                        'answers.options',
+                        'JenisPertanyaan',
+                        'periode',
+                    ])
+                        ->where('periode_id', $this->periodeId)
+                        ->whereNotNull('periode_id')
+                        ->orderBy('id')
                         ->get();
 
                     return view('Admin.GeneralReport.template-status-outlet', [
-                        'data' => $data,
+                        'data'           => $data,
+                        'pertanyaanList' => $pertanyaanList,
                     ]);
                 }
             },

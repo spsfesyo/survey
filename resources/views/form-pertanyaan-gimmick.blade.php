@@ -60,7 +60,7 @@
 
                             <div class="card-body">
 
-                                <form method="POST" action="{{ route('submit-final') }}">
+                                <form method="POST" action="{{ route('post-form-pertanyaan-gimmick') }}">
                                     @csrf
                                     {{-- dibawah ini untuk hidden menyimpan session sps_name untuk dikembalikan dalam bentuk token ke dalam visit sales --}}
                                     <input type="hidden" name="token" value="{{ session('raw_token') }}">

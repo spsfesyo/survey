@@ -380,12 +380,12 @@ class RespondentController extends Controller
         // simpan ke session
         session([
             'form_gimmick' => [
-                'is_gimmick' => $request->is_gimmick
+                'is_gimmick' => (int) $request->is_gimmick
             ]
         ]);
 
-        // lanjut ke submit final
-        return redirect()->route('submit-final');
+        // Form terakhir → langsung proses submit final
+        return $this->submitFinalAnswer($request);   // ✅ panggil method, bukan redirect
     }
 
 
@@ -884,7 +884,7 @@ class RespondentController extends Controller
     public function submitFinalAnswer(Request $request)
     {
         // info($request);
-        
+
         /* ====================================================
      * 1️⃣ AMBIL DATA SESI FORM
      * ==================================================== */
@@ -910,22 +910,22 @@ class RespondentController extends Controller
         /* ====================================================
      * 2️⃣ PROSES FOTO BASE64
      * ==================================================== */
-    // info($formPelayanan['foto_base64']);
+        // info($formPelayanan['foto_base64']);
         $fotoPath = null;
         // if ($formPelayanan['foto_base64']) {
-            info("hahaha");
-            try {
-                $base64 = preg_replace('#^data:image/\w+;base64,#i', '', $formPelayanan['foto_base64']);
-                $data = base64_decode($base64);
-                $fileName = 'foto-respondent/' . Str::uuid() . '.jpg';
-                Storage::disk('public')->put($fileName, $data);
-                $result = Storage::disk('public')->put($fileName, $data);
-                // info("wkwkwkwk");
-                // info($result);
-                $fotoPath = 'storage/' . $fileName;
-            } catch (\Throwable $e) {
-                logger('Foto gagal disimpan: ' . $e->getMessage());
-            }
+        info("hahaha");
+        try {
+            $base64 = preg_replace('#^data:image/\w+;base64,#i', '', $formPelayanan['foto_base64']);
+            $data = base64_decode($base64);
+            $fileName = 'foto-respondent/' . Str::uuid() . '.jpg';
+            Storage::disk('public')->put($fileName, $data);
+            $result = Storage::disk('public')->put($fileName, $data);
+            // info("wkwkwkwk");
+            // info($result);
+            $fotoPath = 'storage/' . $fileName;
+        } catch (\Throwable $e) {
+            logger('Foto gagal disimpan: ' . $e->getMessage());
+        }
         // }
 
         /* ====================================================
